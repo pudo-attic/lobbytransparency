@@ -20,8 +20,8 @@ def parse_rep(rep_el):
     rep = {}
     rep['identificationCode'] = rep_el.findtext(NS + 'identificationCode')
     rep['status'] = rep_el.findtext(NS + 'status')
-    rep['registrationDate'] = rep_el.findtext(NS + 'registrationDate')
-    rep['lastUpdateDate'] = rep_el.findtext(NS + 'lastUpdateDate')
+    rep['registrationDate'] = dateconv(rep_el.findtext(NS + 'registrationDate'))
+    rep['lastUpdateDate'] = dateconv(rep_el.findtext(NS + 'lastUpdateDate'))
     rep['legalStatus'] = rep_el.findtext(NS + 'legalStatus')
     rep['acronym'] = rep_el.findtext(NS + 'acronym')
     rep['originalName'] = rep_el.findtext('.//' + NS + 'originalName')
@@ -100,10 +100,9 @@ def parse_rep(rep_el):
             rep['organisations'].append(org)
 
     fd_el = rep_el.find(NS + 'financialData')
-    # TODO: in the future, store each financial report on its own.
     fd = {}
-    fd['startDate'] = fd_el.findtext(NS + 'startDate')
-    fd['endDate'] = fd_el.findtext(NS + 'endDate')
+    fd['startDate'] = dateconv(fd_el.findtext(NS + 'startDate'))
+    fd['endDate'] = dateconv(fd_el.findtext(NS + 'endDate'))
     fd['eurSourcesProcurement'] = fd_el.findtext(NS + 'eurSourcesProcurement')
     fd['eurSourcesGrants'] = fd_el.findtext(NS + 'eurSourcesGrants')
     fi = fd_el.find(NS + 'financialInformation')
@@ -189,17 +188,13 @@ def parse_rep(rep_el):
                     'max': max_
                     })
     rep['fd'] = fd
-    pprint(rep)
     return rep
 
-def parse(file_name, handle_func):
-    data = []
+def parse(file_name):
     doc = etree.parse(file_name)
     for rep_el in doc.findall('//' + NS + 'interestRepresentativeNew'):
         rep = parse_rep(rep_el)
-        handle_func(rep)
-        data.append(rep)
-    return data
+        yield rep
 
 
 def load(rep):
