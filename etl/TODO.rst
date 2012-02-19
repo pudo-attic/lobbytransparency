@@ -27,7 +27,19 @@ Deduplication
 
 * Company types (in representatives)
 * Persons (unexpected, large overlap)
+* Countries (to ISO2)
 
+What information can be used for de-duplication? 
+
+* Source table (e.g. all legal/head are natural persons)
+* ``legalStatus`` and suffix in company name
+
+What is the goal? An entity table of the form: 
+
+* ``etlFingerPrint`` -Source surface form
+* ``etlTable`` - table in which it occurred (representative, person, org)
+* ``canonicalName`` - final and unique name
+* ``canonicalType`` - a type within a custom taxonomy (tbd)
 
 
 Munging performed
@@ -39,6 +51,8 @@ Munging performed
   munging the percentage figures into absolute figures very early
   in ETL. (cf.: customersGroupsInAbsoluteRange,
   customersGroupsInPercentageRange)
-
+* Customized sources of income are divided into "public" and "other"
+  in the source schema. In the ETL version, this is a flag on the 
+  same table.
 
 
