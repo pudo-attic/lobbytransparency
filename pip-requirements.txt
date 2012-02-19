@@ -1,3 +1,6 @@
-lxml=2.3.3
+lxml==2.3.3
 -e git+https://github.com/okfn/sqlaload#egg=sqlaload
+-e git+https://github.com/okfn/recon#egg=recon
 psycopg2
+python-Levenshtein==0.10.2
+Unidecode==0.04.9
