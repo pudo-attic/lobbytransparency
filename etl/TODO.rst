@@ -40,6 +40,8 @@ What is the goal? An entity table of the form:
 * ``etlTable`` - table in which it occurred (representative, person, org)
 * ``canonicalName`` - final and unique name
 * ``canonicalType`` - a type within a custom taxonomy (tbd)
+* ``canonicalURI`` - a URI (e.g. OpenCorporates) associated with the entity.
+  Use home pages when given (and no reconciliation was feasible)?
 
 
 Munging performed
