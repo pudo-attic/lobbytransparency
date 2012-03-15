@@ -1,1 +1,3 @@
 etl/data/*
+*.pyc
+*.DS_Store
