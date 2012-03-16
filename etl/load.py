@@ -69,6 +69,8 @@ def load_persons(grano, engine, rep):
         psn['firstName'] = person['firstName']
         psn['lastName'] = person['lastName']
         psn['salutation'] = person['title']
+        psn['accreditationEndDate'] = person.get('accreditationEndDate')
+        psn['accreditationStartDate'] = person.get('accreditationStartDate')
         psn['actsAsPerson'] = True
         psn = grano.updateEntity(psn)
 

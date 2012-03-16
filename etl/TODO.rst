@@ -8,6 +8,12 @@ Extract/Transform/Load Microtasks
   * ``financial_data``
   * ``member_organisations``
 
+
+Cleaning tasks
+--------------
+
+Assign codes to organization groups. 
+
 What is the final data model?
 -----------------------------
 

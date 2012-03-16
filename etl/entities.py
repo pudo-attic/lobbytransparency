@@ -35,7 +35,7 @@ def update_entities(engine, file_name):
         entity = data.get(fp)
         if entity and entity.get('canonicalName') and \
             fp != entity.get('canonicalName'):
-            print entity.get('canonicalName').encode('utf-8')
+            #print entity.get('canonicalName').encode('utf-8')
             row['canonicalName'] = entity.get('canonicalName')
             out = row.copy()
             del out['id']

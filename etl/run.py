@@ -9,12 +9,13 @@ from load import load
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
     import sys
-    assert len(sys.argv) == 2, "Usage: %s [source_file]"
-    source_file = sys.argv[1]
+    logging.basicConfig(level=logging.DEBUG)
+    assert len(sys.argv) == 3, "Usage: %s [ir_source_file] [ap_source_file]"
+    ir_source_file = sys.argv[1]
+    ap_source_file = sys.argv[2]
     engine = sl.connect(SETTINGS.ETL_URL)
-    extract(engine, source_file)
+    extract(engine, ir_source_file, ap_source_file)
     create_entities(engine)
     update_entities(engine, 'entities.csv')
     load(engine)

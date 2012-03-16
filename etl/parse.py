@@ -13,9 +13,16 @@ NS = '{%s}' % _NS
 NS2 = '{%s}' % _NS2
 SI = '{%s}' % _SI
 
+_AP = "http://ec.europa.eu/transparencyregister/accreditedPerson/V1"
+AP = '{%s}' % _AP
+
 
 def dateconv(ds):
     return datetime.strptime(ds, "%Y-%m-%dT%H:%M:%S.%f+01:00")
+
+
+def ap_dateconv(ds):
+    return datetime.strptime(ds, "%Y-%m-%d+%H:%M")
 
 
 def parse_rep(rep_el):
@@ -198,3 +205,19 @@ def parse(file_name):
     for rep_el in doc.findall('//' + NS + 'interestRepresentativeNew'):
         rep = parse_rep(rep_el)
         yield rep
+
+
+def parse_ap(file_name):
+    doc = etree.parse(file_name)
+    for ap_el in doc.findall('//' + AP + 'accreditedPerson'):
+        ap = {
+            'orgIdentificationCode': ap_el.findtext(AP + 'orgIdentificationCode'),
+            'numberOfIR': ap_el.findtext(AP + 'numberOfIR'),
+            'orgName': ap_el.findtext(AP + 'orgName'),
+            'title': ap_el.findtext(AP + 'title'),
+            'firstName': ap_el.findtext(AP + 'firstName'),
+            'lastName': ap_el.findtext(AP + 'lastName'),
+            'accreditationStartDate': ap_dateconv(ap_el.findtext(AP + 'accreditationStartDate')),
+            'accreditationEndDate': ap_dateconv(ap_el.findtext(AP + 'accreditationEndDate')),
+            }
+        yield ap

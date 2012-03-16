@@ -19,6 +19,7 @@ def load_person(person, role, childBase, engine):
                                               person['lastName'])
     person_['etlFingerPrint'] = person_['etlFingerPrint'].strip()
     sl.upsert(engine, table, person_, ['representativeEtlId',
+                                       'role',
                                        'etlFingerPrint'])
 
 
@@ -91,16 +92,37 @@ def load_rep(rep, engine):
               ['etlId'])
 
 
-def extract(engine, source_file):
-    log.info("Extracting data from %s", source_file)
-    for i, rep in enumerate(parse.parse(source_file)):
+def load_ap(ap, engine):
+    orgs = list(sl.find(engine, sl.get_table(engine, 'representative'),
+                   identificationCode=ap['orgIdentificationCode']))
+    if len(orgs):
+        org = max(orgs, key=lambda o: o['lastUpdateDate'])
+        childBase = {'representativeEtlId': org['etlId'],
+                 'representativeUpdateDate': org['lastUpdateDate']}
+        load_person(ap, 'accredited', childBase, engine)
+    else:
+        print ap
+
+
+def extract(engine, ir_source_file, ap_source_file):
+    log.info("Extracting org data from %s", ir_source_file)
+    for i, rep in enumerate(parse.parse(ir_source_file)):
         load_rep(rep, engine)
         if i % 100 == 0:
             log.info("Extracted: %s...", i)
 
+    log.info("Extracting accredditation data from %s", ap_source_file)
+    for i, ap in enumerate(parse.parse_ap(ap_source_file)):
+        load_ap(ap, engine)
+        if i % 100 == 0:
+            log.info("Extracted: %s...", i)
+
+
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
     import sys
-    assert len(sys.argv) == 2, "Usage: %s [source_file]"
-    source_file = sys.argv[1]
+    assert len(sys.argv) == 3, "Usage: %s [ir_source_file] [ap_source_file]"
+    ir_source_file = sys.argv[1]
+    ap_source_file = sys.argv[2]
     engine = sl.connect(SETTINGS.ETL_URL)
-    extract(engine, source_file)
+    extract(engine, ir_source_file, ap_source_file)

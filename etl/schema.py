@@ -102,6 +102,16 @@ ACTOR = {
             'label': 'Salutation',
             'help': ''
             },
+        'accreditationStartDate': {
+            'type': 'date',
+            'label': 'EP Accreditation Start Date',
+            'help': ''
+            },
+        'accreditationEndDate': {
+            'type': 'date',
+            'label': 'EP Accreditation End Date',
+            'help': ''
+            },
 
         'acronym': {
             'type': 'string',
