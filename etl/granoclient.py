@@ -28,7 +28,7 @@ class GranoClient(object):
         network = network or (not ignore_network and self.network)
         for elem in [network, collection, subcollection, member, submember]:
             if elem:
-                url += '/' + elem
+                url += '/' + str(elem)
         return url
 
     def _request(self, method, collection, params=None,
@@ -41,7 +41,9 @@ class GranoClient(object):
         print method, url
         data = json.dumps(data, cls=GranoJSONEncoder) if data else None
         response = self.session.request(method, url,
-            params=params, data=data, allow_redirects=True)
+            params=params, data=data)
+        if not response.ok:
+            print response.status_code, response.text
         return (response, lambda: json.loads(response.text))
 
     def getNetwork(self, slug=None):
@@ -54,8 +56,8 @@ class GranoClient(object):
         return data() if res.ok else []
 
     def createNetwork(self, obj):
-        res, data = self._request('post', None,
-            data=obj)
+        res, data = self._request('post', 'networks',
+            data=obj, ignore_network=True)
         return data() if res.ok else None
 
     def updateNetwork(self, obj):
@@ -112,4 +114,82 @@ class GranoClient(object):
         return self.updateSchema(self, 'relation', obj,
             name=name(), network=network)
 
+    def _findCollectionItem(self, collection, type=None, network=None,
+        filters=[], limit=100, offset=0):
+        params = {'limit': limit, 'offset': offset, 'filter': []}
+        if type is not None:
+            params['type'] = type
+        for filter_ in filters:
+            params['filter'].append('%s:%s' % filter_)
+        res, data = self._request('get', collection, params=params,
+            network=network)
+        return data() if res.ok else []
 
+    def findEntities(self, type=None, network=None, filters=[], limit=100,
+        offset=0):
+        return self._findCollectionItem('entities', type=type, network=network,
+            filters=filters, limit=limit, offset=offset)
+
+    def findEntity(self, type, network=None, **kw):
+        res = self.findEntities(type=type, network=network, filters=kw.items(),
+                                limit=1)
+        return res.pop() if res else None
+
+    def findRelations(self, type=None, network=None, filters=[], limit=100,
+        offset=0):
+        return self._findCollectionItem('relations', type=type, network=network,
+            filters=filters, limit=limit, offset=offset)
+
+    def findRelation(self, type, network=None, **kw):
+        res = self.findRelations(type=type, network=network, filters=kw.items(),
+                                limit=1)
+        return res.pop() if res else None
+
+    def _getCollectionItem(self, collection, id, network=None, deep=False):
+        submember = 'deep' if deep else None
+        res, data = self._request('get', collection, network=network,
+            submember=submember)
+        return data() if res.ok else None
+
+    def getEntity(self, id, network=None, deep=False):
+        return self._getCollectionItem('entities', id, network=network, deep=deep)
+
+    def getRelation(self, id, network=None, deep=False):
+        return self._getCollectionItem('relations', id, network=network, deep=deep)
+
+    def _createCollectionItem(self, collection, obj, network=None):
+        res, data = self._request('post', collection, network=network,
+            data=obj)
+        return data() if res.ok else None
+
+    def createEntity(self, obj, network=None):
+        return self._createCollectionItem('entities', obj, network=network)
+
+    def createRelation(self, obj, network=None):
+        return self._createCollectionItem('relations', obj, network=network)
+
+    def _updateCollectionItem(self, collection, obj, network=None):
+        if not 'id' in obj:
+            return self._createCollectionItem(collection, obj, network=network)
+        res, data = self._request('put', collection, network=network,
+            member=obj['id'], data=obj)
+        return data() if res.ok else None
+
+    def updateEntity(self, obj, network=None):
+        return self._updateCollectionItem('entities', obj, network=network)
+
+    def updateRelation(self, obj, network=None):
+        return self._updateCollectionItem('relations', obj, network=network)
+
+    def _deleteCollectionItem(self, collection, id, network=None):
+        if isinstance(id, dict):
+            id = id.get('id')
+        res, data = self._request('delete', collection, network=network,
+            member=id)
+        return data() if res.ok else None
+
+    def deleteEntity(self, id, network=None):
+        return self._deleteCollectionItem('entities', id, network=network)
+
+    def deleteRelation(self, id, network=None):
+        return self._deleteCollectionItem('relations', id, network=network)
