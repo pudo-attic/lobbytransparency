@@ -3,6 +3,7 @@ from pprint import pprint
 import sqlaload as sl
 import extract_xml
 
+import SETTINGS
 
 def load_person(person, role, childBase, engine):
     table = sl.get_table(engine, 'person')
@@ -95,7 +96,7 @@ def load_etldb(source_file, engine):
 
 if __name__ == '__main__':
     import sys
-    assert len(sys.argv) == 3, "Usage: %s [source_file] [engine-url]"
+    assert len(sys.argv) == 2, "Usage: %s [source_file]"
     source_file = sys.argv[1]
-    engine = sl.connect(sys.argv[2])
+    engine = sl.connect(SETTINGS.ETL_URL)
     load_etldb(source_file, engine)

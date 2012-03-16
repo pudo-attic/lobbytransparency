@@ -6,6 +6,7 @@ import sqlaload as sl
 from common import integrate_recon
 from normalize import normalize_text
 
+import SETTINGS
 
 def update_entities(engine, file_name):
     data = {}
@@ -67,9 +68,7 @@ def cluster(engine):
 
 
 if __name__ == '__main__':
-    import sys
-    assert len(sys.argv) == 2, "Usage: %s [engine-url]"
-    engine = sl.connect(sys.argv[1])
+    engine = sl.connect(SETTINGS.ETL_URL)
     create_entities(engine)
     update_entities(engine, 'entities.csv')
     #recon_companies(engine)

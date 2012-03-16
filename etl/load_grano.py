@@ -162,6 +162,8 @@ def load_representatives(grano, engine):
         # TODO: name resolution
         title = canonical_name(grano, engine, rep['originalName'])
         rep_ent = grano.findEntity(ACTOR['name'], title=title) or {}
+        if not SETTINGS.FULL and rep_ent['etlId'] == rep['etlId']:
+            continue
         rep_ent.update(rep)
         rep_ent['type'] = ACTOR['name']
         rep_ent['actsAsRepresentative'] = True
