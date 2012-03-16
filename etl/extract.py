@@ -1,7 +1,8 @@
 from pprint import pprint
 
 import sqlaload as sl
-import load_xml
+import extract_xml
+
 
 def load_person(person, role, childBase, engine):
     table = sl.get_table(engine, 'person')
@@ -14,6 +15,7 @@ def load_person(person, role, childBase, engine):
     person_['etlFingerPrint'] = person_['etlFingerPrint'].strip()
     sl.upsert(engine, table, person_, ['representativeEtlId',
                                        'etlFingerPrint'])
+
 
 def load_finances(financialData, childBase, engine):
     etlId = '%s//%s' % (financialData['startDate'].isoformat(),
@@ -35,7 +37,7 @@ def load_finances(financialData, childBase, engine):
         turnover['etlFingerPrint'] = turnover['name'].strip()
         turnover.update(childBase)
         sl.upsert(engine, sl.get_table(engine, 'financialDataTurnover'),
-                  turnover, ['representativeEtlId', 'financialDataEtlId', 
+                  turnover, ['representativeEtlId', 'financialDataEtlId',
                              'etlFingerPrint'])
 
     financialData['etlId'] = etlId
@@ -44,10 +46,11 @@ def load_finances(financialData, childBase, engine):
               financialData, ['representativeEtlId', 'etlId'])
     #pprint(financialData)
 
+
 def load_rep(rep, engine):
     etlId = rep['etlId'] = "%s//%s" % (rep['identificationCode'],
                                        rep['lastUpdateDate'].isoformat())
-    childBase = {'representativeEtlId': etlId, 
+    childBase = {'representativeEtlId': etlId,
                  'representativeUpdateDate': rep['lastUpdateDate']}
     load_person(rep.pop('legalPerson'), 'legal', childBase, engine)
     load_person(rep.pop('headPerson'), 'head', childBase, engine)
@@ -84,20 +87,15 @@ def load_rep(rep, engine):
 
 
 def load_etldb(source_file, engine):
-    for i, rep in enumerate(load_xml.parse(source_file)):
+    for i, rep in enumerate(extract_xml.parse(source_file)):
         load_rep(rep, engine)
         if i % 100 == 0:
             print i, "..."
 
+
 if __name__ == '__main__':
     import sys
-    assert len(sys.argv)==3, "Usage: %s [source_file] [engine-url]"
+    assert len(sys.argv) == 3, "Usage: %s [source_file] [engine-url]"
     source_file = sys.argv[1]
     engine = sl.connect(sys.argv[2])
     load_etldb(source_file, engine)
-
-
-
-
-
-

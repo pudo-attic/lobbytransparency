@@ -5,16 +5,18 @@ from pprint import pprint
 #import model
 
 SRC = 'http://ec.europa.eu/transparencyregister/public/consultation/statistics.do?action=getLobbyistsXml&fileType=NEW'
-_NS2="http://www.w3.org/1999/xlink"
+_NS2 = "http://www.w3.org/1999/xlink"
 #_NS="http://intragate.ec.europa.eu/transparencyregister/intws/20090623_new"
-_NS="http://intragate.ec.europa.eu/transparencyregister/intws/20110715"
-_SI="http://www.w3.org/2001/XMLSchema-instance"
+_NS = "http://intragate.ec.europa.eu/transparencyregister/intws/20110715"
+_SI = "http://www.w3.org/2001/XMLSchema-instance"
 NS = '{%s}' % _NS
 NS2 = '{%s}' % _NS2
 SI = '{%s}' % _SI
 
+
 def dateconv(ds):
     return datetime.strptime(ds, "%Y-%m-%dT%H:%M:%S.%f+01:00")
+
 
 def parse_rep(rep_el):
     rep = {}
@@ -139,7 +141,7 @@ def parse_rep(rep_el):
             src['name'] = src_el.findtext(NS + 'name')
             src['amount'] = src_el.findtext(NS + 'amount')
             fd['otherCustomized'].append(src)
-    
+
     fd['directfdCostsMin'] = fi.findtext('.//' + NS +
         'directfdresentationCosts//' + NS + 'min')
     fd['directfdCostsMax'] = fi.findtext('.//' + NS +
@@ -169,16 +171,16 @@ def parse_rep(rep_el):
                     'max': max_
                     })
         for range_ in tb.findall(NS + 'customersGroupsInPercentageRange'):
-            # FIXME: I hate political compromises going into DB design 
+            # FIXME: I hate political compromises going into DB design
             # so directly.
             max_ = range_.findtext('.//' + NS + 'max')
             if max_:
-                max_ = float(max_)/100.0 * \
+                max_ = float(max_) / 100.0 * \
                         float(fd['turnoverAbsolute'] or
                                 fd['turnoverMax'] or fd['turnoverMin'])
             min_ = range_.findtext('.//' + NS + 'min')
             if min_:
-                min_ = float(min_)/100.0 * \
+                min_ = float(min_) / 100.0 * \
                         float(fd['turnoverAbsolute'] or
                                 fd['turnoverMin'] or fd['turnoverMax'])
             for customer in range_.findall('.//' + NS + 'customer'):
@@ -190,121 +192,9 @@ def parse_rep(rep_el):
     rep['fd'] = fd
     return rep
 
+
 def parse(file_name):
     doc = etree.parse(file_name)
     for rep_el in doc.findall('//' + NS + 'interestRepresentativeNew'):
         rep = parse_rep(rep_el)
         yield rep
-
-
-def load(rep):
-    r = model.Representative()
-    r.identificationCode = rep['identificationCode']
-    r.status = rep['status']
-    r.registrationDate = dateconv(rep['registrationDate'])
-    r.lastUpdateDate = dateconv(rep['lastUpdateDate'])
-    r.legalStatus = rep['legalStatus']
-    r.acronym = rep['acronym']
-    r.originalName = rep['originalName']
-    r.name = rep['originalName']
-    r.webSiteURL = rep['webSiteURL']
-    r.mainCategory = rep['mainCategory']
-    r.subCategory = rep['subCategory']
-    r.goals = rep['goals']
-    r.networking = rep['networking']
-    r.activities = rep['activities']
-    r.codeOfConduct = rep['codeOfConduct']
-    r.members = rep['members']
-
-    r.legalPersonTitle = rep['legalPersonTitle']
-    r.legalPersonFirstName = rep['legalPersonFirstName']
-    r.legalPersonLastName = rep['legalPersonLastName']
-    r.legalPersonPosition = rep['legalPersonPosition']
-    
-    r.headPersonTitle = rep['headPersonTitle']
-    r.headPersonFirstName = rep['headPersonFirstName']
-    r.headPersonLastName = rep['headPersonLastName']
-    r.headPersonPosition = rep['headPersonPosition']
-
-    r.contactStreet = rep['contactStreet']
-    r.contactNumber = rep['contactNumber']
-    r.contactPostCode = rep['contactPostCode']
-    r.contactTown = rep['contactTown']
-    r.contactCountry = model.Country.have(rep['contactCountry'])
-    r.contactIndicPhone = rep['contactIndicPhone']
-    r.contactPhone = rep['contactPhone']
-    r.contactIndicFax = rep['contactIndicFax']
-    r.contactFax = rep['contactFax']
-    r.contactMore = rep['contactMore']
-
-    r.interests = map(model.Interest.have, rep['interests'])
-    r.actionFields = map(model.ActionField.have, rep['actionFields'])
-    r.countryOfMembers = map(model.Country.have, rep['countryOfMembers'])
-    r.memberships = [model.Organisation.have(o['name'], \
-        members=o['numberOfMembers']) for o in rep['organisations']]
-    model.db.session.add(r)
-    
-    fd = model.FinancialData()
-    fd.representative = r
-    fd.type = rep['fdType']
-    fd.startDate = dateconv(rep['fdStartDate'])
-    fd.endDate = dateconv(rep['fdEndDate'])
-    fd.eurSourcesProcurement = rep['fdEurSourcesProcurement']
-    fd.eurSourcesGrants = rep['fdEurSourcesGrants']
-    fd.totalBudget = rep['fdTotalBudget']
-    fd.publicFinancingTotal = rep['fdPublicFinancingTotal']
-    fd.publicFinancingNational = rep['fdPublicFinancingNational']
-    fd.publicFinancingInfranational = rep['fdPublicFinancingInfranational']
-    fd.otherSourcesTotal = rep['fdOtherSourcesTotal']
-    fd.otherSourcesDonation = rep['fdOtherSourcesDonation']
-    fd.otherSourcesContributions = rep['fdOtherSourcesContributions']
-    fd.directRepCostsMin = rep['fdDirectRepCostsMin']
-    fd.directRepCostsMax = rep['fdDirectRepCostsMax']
-    fd.costMin = rep['fdCostMin']
-    fd.costMax = rep['fdCostMax']
-    fd.costAbsolute = rep['fdCostAbsolute']
-    fd.turnoverMin = rep['fdTurnoverMin']
-    fd.turnoverMax = rep['fdTurnoverMax']
-    fd.turnoverAbsolute = rep['fdTurnoverAbsolute']
-
-    for src in rep['fdPublicCustomized']:
-        fs = model.FinancialSource()
-        fs.financialData = fd
-        fs.public = True
-        fs.name = src['name']
-        fs.amount = src['amount']
-        model.db.session.add(fs)
-
-    for src in rep['fdOtherCustomized']:
-        fs = model.FinancialSource()
-        fs.financialData = fd
-        fs.public = False
-        fs.name = src['name']
-        fs.amount = src['amount']
-        model.db.session.add(fs)
-
-    for bd in rep['fdTurnoverBreakdown']:
-        t = model.Turnover()
-        t.financialData = fd
-        t.representative = r
-        t.customer = model.Organisation.have(bd['name'])
-        t.min = bd['min']
-        t.max = bd['max']
-        model.db.session.add(t)
-    
-    print r.id
-    model.db.session.add(fd)
-    model.db.session.commit()
-
-if __name__ == '__main__':
-    file_name = 'samples.xml'
-    #file_name = SRC
-    #model.db.drop_all()
-    #model.db.create_all()
-    #data = parse(file_name, load)
-    data = parse(file_name, lambda x: x)
-    #print len(data)
-    #print len([d['identificationCode'] for d in data])
-    #model.db.session.commit()
-
-
