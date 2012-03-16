@@ -1,9 +1,13 @@
+import logging
 from pprint import pprint
 
 import sqlaload as sl
-import extract_xml
+import parse
 
 import SETTINGS
+
+log = logging.getLogger('extract')
+
 
 def load_person(person, role, childBase, engine):
     table = sl.get_table(engine, 'person')
@@ -87,16 +91,16 @@ def load_rep(rep, engine):
               ['etlId'])
 
 
-def load_etldb(source_file, engine):
-    for i, rep in enumerate(extract_xml.parse(source_file)):
+def extract(engine, source_file):
+    log.info("Extracting data from %s", source_file)
+    for i, rep in enumerate(parse.parse(source_file)):
         load_rep(rep, engine)
         if i % 100 == 0:
-            print i, "..."
-
+            log.info("Extracted: %s...", i)
 
 if __name__ == '__main__':
     import sys
     assert len(sys.argv) == 2, "Usage: %s [source_file]"
     source_file = sys.argv[1]
     engine = sl.connect(SETTINGS.ETL_URL)
-    load_etldb(source_file, engine)
+    extract(engine, source_file)

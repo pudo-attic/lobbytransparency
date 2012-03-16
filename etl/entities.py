@@ -1,3 +1,4 @@
+import logging
 import csv, os
 
 from recon import company
@@ -8,7 +9,10 @@ from normalize import normalize_text
 
 import SETTINGS
 
+log = logging.getLogger('load')
+
 def update_entities(engine, file_name):
+    log.info("Updateing entities reference sheet: %s", file_name)
     data = {}
     if os.path.exists(file_name):
         fh = open(file_name, 'rb')
@@ -45,6 +49,7 @@ def update_entities(engine, file_name):
 
 
 def create_entities(engine):
+    log.info("De-normalizing global entities collection...")
     table = sl.get_table(engine, 'entity')
     for tbl in ['representative', 'person', 'financialDataTurnover',
         'organisation']:

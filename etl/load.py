@@ -1,3 +1,4 @@
+import logging
 import sqlaload as sl
 
 from granoclient import GranoClient
@@ -5,6 +6,7 @@ from granoclient import GranoClient
 import SETTINGS
 from schema import *
 
+log = logging.getLogger('load')
 
 def create_network(grano):
     net = grano.getNetwork()
@@ -179,12 +181,15 @@ def load_representatives(grano, engine):
         load_action_fields(grano, engine, rep_)
 
 
-if __name__ == '__main__':
-    engine = sl.connect(SETTINGS.ETL_URL)
-
+def load(engine):
+    log.info("Beginning to load data into Grano: %s", SETTINGS.GRANO_API)
     grano = GranoClient(SETTINGS.GRANO_API,
         network=NETWORK['slug'],
         api_user=SETTINGS.GRANO_AUTH[0],
         api_password=SETTINGS.GRANO_AUTH[1])
     create_network(grano)
     load_representatives(grano, engine)
+
+if __name__ == '__main__':
+    engine = sl.connect(SETTINGS.ETL_URL)
+    load(engine)
