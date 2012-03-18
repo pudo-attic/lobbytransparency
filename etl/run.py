@@ -6,6 +6,7 @@ import sqlaload as sl
 from extract import extract
 from entities import create_entities, update_entities
 from load import load
+from transform import transform
 
 
 if __name__ == '__main__':
@@ -18,4 +19,5 @@ if __name__ == '__main__':
     extract(engine, ir_source_file, ap_source_file)
     create_entities(engine)
     update_entities(engine, 'entities.csv')
+    transform(engine)
     load(engine)

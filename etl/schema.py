@@ -203,6 +203,11 @@ ACTOR = {
             'label': 'Category',
             'help': ''
             },
+        'mainCategoryId': {
+            'type': 'integer',
+            'label': 'Category (ID)',
+            'help': ''
+            },
         'members': {
             'type': 'integer',
             'label': '# Members',
@@ -236,6 +241,11 @@ ACTOR = {
         'subCategory': {
             'type': 'string',
             'label': 'Sub-Category',
+            'help': ''
+            },
+        'subCategoryId': {
+            'type': 'integer',
+            'label': 'Sub-Category ID',
             'help': ''
             },
         'webSiteURL': {

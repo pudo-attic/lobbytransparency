@@ -1,5 +1,13 @@
-Extract/Transform/Load Microtasks
-=================================
+Microtasks
+==========
+
+* Assign codes to organization groups. 
+* 
+
+
+
+
+
 
 * ETL Model:
   * ``representative``
@@ -12,7 +20,7 @@ Extract/Transform/Load Microtasks
 Cleaning tasks
 --------------
 
-Assign codes to organization groups. 
+
 
 What is the final data model?
 -----------------------------
