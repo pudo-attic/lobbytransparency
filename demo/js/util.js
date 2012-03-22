@@ -79,7 +79,7 @@ cur.numRange = function(min, max, abs) {
 };
 
 Handlebars.registerHelper('preformatted', function(text) {
-  return new Handlebars.SafeString(text.replace('\n', '<br/>\n'));
+  return new Handlebars.SafeString(text.replace(/\n/g, '<br/>\n'));
 });
 
 Handlebars.registerHelper('dateformat', function(text) {

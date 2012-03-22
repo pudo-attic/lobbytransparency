@@ -85,6 +85,7 @@ title: Loading...
                 <p>{{preformatted this}}</p>
             {{/activities}}
 
+            {{#if fdType}}
             <h3>Financial Statement
                 <small>Period of {{dateformat fdStartDate}} -
                    {{dateformat fdEndDate}}</small>
@@ -158,8 +159,24 @@ title: Loading...
                     <td colspan="2">Total Budget</td>
                     <td>{{amount fdTotalBudget}}</td>
                 </tr>
-          </table>
+            </table>
+            {{/if}}
 
+            {{#if accreditations}}
+            <h3>European Parliament Accreditations</h3>
+            <table class="table table-striped table-condensed">
+                <tr>
+                    <th>Name</th>
+                    <th width="20%">Accreditation End</th>
+                </tr>
+                {{#accreditations}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                        <td width="20%">{{dateformat accreditationEndDate}}</td>
+                    </tr>
+                {{/accreditations}}
+            </table>
+            {{/if}}
 
 
             {{#goals}}
@@ -186,6 +203,9 @@ title: Loading...
 
 <script>
     $(function() {
+        var templates = {
+            actor: Handlebars.compile($('#actor').html())
+            };
         hashChange = function() {
             var query = document.location.hash.substring(1);
             if(!query.length) {
@@ -216,14 +236,21 @@ title: Loading...
                         return e.target; 
                     }));
 
+                data.accreditations = _.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='employment' && e.role=='accredited'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        e.target.position = e.position;
+                        return e.target; 
+                    });
+
                 data.fdCost = LobbyTransparency.numRange(data.fdCostMin, data.fdCostMax, data.fdCostAbsolute);
                 data.fdDirectRepCosts = LobbyTransparency.numRange(data.fdDirectRepCostsMin, data.fdDirectRepCostsMax);
                 data.fdTurnover= LobbyTransparency.numRange(data.fdTurnoverMin, data.fdTurnoverMax, 
                     data.fdTurnoverAbsolute);
 
                 console.log(data);
-                var template = Handlebars.compile($('#' + data.type).html());
-                $('#entity').html(template(data));
+                $('#entity').html(templates[data.type](data));
             }, 'jsonp');
         };
 
