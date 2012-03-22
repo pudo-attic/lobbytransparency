@@ -1,13 +1,13 @@
 ---
 layout: default
-title: ENTITY
+title: Loading...
 ---
 
 <div id='entity'></div>
 
 {% raw %}
-<script id="entity-template" type="text/x-handlebars-template">
-    <h2 class="page-header">{{title}}</h2>
+<script id="actor" type="text/x-handlebars-template">
+    <h2 class="page-header">{{title}} <small>{{acronym}}</small></h2>
     Roles: 
     <ul>
         {{#actsAsPerson}}<li>Person</li>{{/actsAsPerson}}
@@ -16,11 +16,173 @@ title: ENTITY
         {{#actsAsOrganisation}}<li>Organisation</li>{{/actsAsOrganisation}}
     </ul>
 
+    <div class='row'>
+        <div class='span4'>
+            <dl>
+                {{#acronym}}
+                    <dt>Acronym</dt>
+                    <dd>{{this}}</dd>
+                {{/acronym}}
+                {{#subCategory}}
+                    <dt>Category</dt>
+                    <dd>{{this}}</dd>
+                {{/subCategory}}
+                {{#legalStatus}}
+                    <dt>Legal Status</dt>
+                    <dd>{{this}}</dd>
+                {{/legalStatus}}
+                {{#head}}
+                    <dt>Head Representative</dt>
+                    <dd>
+                        <a href='{{this.url}}'>{{this.title}}</a>
+                        <p class='help-block'>{{this.position}}</p>
+                    </dd>
+                {{/head}}
+                {{#legal}}
+                    <dt>Legal Representative</dt>
+                    <dd>
+                        <a href='{{this.url}}'>{{this.title}}</a>
+                        <p class='help-block'>{{this.position}}</p>
+                    </dd>
+                {{/legal}}
+                <!-- TODO: legal & head person. -->
+                {{#members}}
+                    <dt>Members/Representatives</dt>
+                    <dd>{{this}}</dd>
+                {{/members}}
+                {{#webSiteURL}}
+                    <dt>Web site</dt>
+                    <dd><a href="{{this}}">{{this}}</a></dd>
+                {{/webSiteURL}}
+                {{#contactPhone}}
+                    <dt>Phone</dt>
+                    <dd>(+{{../contactIndicPhone}}) {{this}}</a></dd>
+                {{/contactPhone}}
+                {{#contactCountry}}
+                    <dt>Address</dt>
+                    <dd><address>
+                        {{../contactStreet}} {{../contactNumber}}<br/>
+                        {{../contactPostCode}} {{../contactTown}}<br/>
+                        {{this}}
+                        {{#../contactMore}}
+                            <p class='help-block'>{{preformatted this}}</p>
+                        {{/../contactMore}}
+                    </address></dd>
+                {{/contactCountry}}
+                {{#if interests}}
+                    <dt>Interests</dt>
+                    <dd><ul class="unstyled">
+                        {{#interests}}
+                            <li>{{this}}</li>
+                        {{/interests}}
+                    </ul></dd>
+                {{/if}}
+                
+            </dl>
+        </div>
+        <div class='span8'>
+            {{#activities}}
+                <p>{{preformatted this}}</p>
+            {{/activities}}
+
+            <h3>Financial Statement
+                <small>Period of {{dateformat fdStartDate}} -
+                   {{dateformat fdEndDate}}</small>
+            </h3>
+            <table class="table table-striped table-condensed">
+                <tr>
+                    <th colspan="2">Expenditure</th>
+                    <th width="20%"></th>
+                </tr>
+                <tr>
+                    <td colspan="2">Cost</td>
+                    <td>{{fdCost}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Direct Representation Cost</td>
+                    <td>{{fdDirectRepCosts}}</td>
+                </tr>
+                <tr>
+                    <th colspan="2">Revenue</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td colspan="2">Client Turnover</td>
+                    <td>{{fdTurnover}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">European Sources</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Grants</td>
+                    <td>{{amount fdEurSourcesGrants}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Procurement</td>
+                    <td>{{amount fdEurSourcesProcurement}}</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Publicly Financed</td>
+                    <td>{{amount fdPublicFinancingTotal}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>National</td>
+                    <td>{{amount fdPublicFinancingNational}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Infranational</td>
+                    <td>{{amount fdPublicFinancingInfranational}}</td>
+                </tr>
+                <!-- TODO: Other -->
+                <tr>
+                    <td colspan="2">Other Sources</td>
+                    <td>{{amount fdOtherSourcesTotal}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Donations</td>
+                    <td>{{amount fdOtherSourcesDonation}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Contributions</td>
+                    <td>{{amount fdOtherSourcesContributions}}</td>
+                </tr>
+                <!-- TODO: Other -->
+                <tr>
+                    <td colspan="2">Total Budget</td>
+                    <td>{{amount fdTotalBudget}}</td>
+                </tr>
+          </table>
+
+
+
+            {{#goals}}
+                <h3>Goals</h3>
+                <p>{{preformatted this}}</p>
+            {{/goals}}
+            {{#networking}}
+                <h3>Networking</h3>
+                <p>{{preformatted this}}</p>
+            {{/networking}}
+        </div>
+    </div>
+
     <br/>
     <h4>Debug (Raw Data)</h4>
     <pre>{{raw}}</pre>
 </script>
 {% endraw %}
+
+
+
+
+
 
 <script>
     $(function() {
@@ -33,7 +195,34 @@ title: ENTITY
             $.get(LobbyTransparency.apiUrl + 'eutr/entities/' + params.id + '/deep', function(data) {
                 $('title').html(data.title);
                 data.raw = JSON.stringify(data, null, '  ');
-                var template = Handlebars.compile($('#entity-template').html());
+
+                data.interests = _.map(_.filter(data.outgoing, 
+                    function(e) { return e.target.type=='interest'; }),
+                    function(e) { return e.target.title; }).sort();
+
+                data.head = _.first(_.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='employment' && e.role=='head'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id); 
+                        e.target.position = e.position;
+                        console.log(e);
+                        return e.target; 
+                    }));
+                data.legal = _.first(_.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='employment' && e.role=='legal'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        e.target.position = e.position;
+                        return e.target; 
+                    }));
+
+                data.fdCost = LobbyTransparency.numRange(data.fdCostMin, data.fdCostMax, data.fdCostAbsolute);
+                data.fdDirectRepCosts = LobbyTransparency.numRange(data.fdDirectRepCostsMin, data.fdDirectRepCostsMax);
+                data.fdTurnover= LobbyTransparency.numRange(data.fdTurnoverMin, data.fdTurnoverMax, 
+                    data.fdTurnoverAbsolute);
+
+                console.log(data);
+                var template = Handlebars.compile($('#' + data.type).html());
                 $('#entity').html(template(data));
             }, 'jsonp');
         };

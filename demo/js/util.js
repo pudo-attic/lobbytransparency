@@ -56,10 +56,39 @@ cur.makeTable = function(elem, queryName, columns) {
       },
       {
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-        "sPaginationType": "bootstrap",
+        "sPaginationType": "bootstrap"
       }
     );
 };
+
+cur.numRange = function(min, max, abs) {
+    var num = '';
+    if (abs) {
+        num = $.format.number(abs, '#,##0.#');
+    } else if (min&&max) {
+        num = $.format.number(min, '#,##0.#') +
+            ' - ' + $.format.number(max, '#,##0.#');
+    } else if (min) {
+        num = 'min. ' + $.format.number(min, '#,##0.#');
+    } else if (max) {
+        num = 'max. ' + $.format.number(max, '#,##0.#');
+    } else {
+        return '';
+    }
+    return new Handlebars.SafeString("<span class='num'>" + num + " &euro;</span>");
+};
+
+Handlebars.registerHelper('preformatted', function(text) {
+  return new Handlebars.SafeString(text.replace('\n', '<br/>\n'));
+});
+
+Handlebars.registerHelper('dateformat', function(text) {
+  return new Date(text).toDateString();
+});
+
+Handlebars.registerHelper('amount', function(num) {
+  return new Handlebars.SafeString(cur.renderAmount()({}, num));
+});
 
 })(jQuery);
 
