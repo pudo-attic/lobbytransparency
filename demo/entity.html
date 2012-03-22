@@ -29,8 +29,8 @@ title: ENTITY
             if(!query.length) {
                 alert("No ID specified!");
             }
-            var params = LobbyTranspareny.parseQuery(query);
-            $.get('http://sna.pudo.org/api/1/eutr/entities/' + params.id + '/deep', function(data) {
+            var params = LobbyTransparency.parseQuery(query);
+            $.get(LobbyTransparency.apiUrl + 'eutr/entities/' + params.id + '/deep', function(data) {
                 $('title').html(data.title);
                 data.raw = JSON.stringify(data, null, '  ');
                 var template = Handlebars.compile($('#entity-template').html());

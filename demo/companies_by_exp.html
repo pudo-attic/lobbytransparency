@@ -29,27 +29,18 @@ title: Companies by expenditure
 <script src="/js/table.js"></script>
 <script>
     $(function() {
-    window.table = new Grano.DataTable(
-      document.getElementById('table'),
-      {
-        source: 'http://sna.pudo.org/api/1',
-        query: 's1',
-        columnDefs: [
+    window.table = LobbyTransparency.makeTable($('#table'), 's1',
+        [
             {
-                aTargets: [0],
-                mDataProp: 'title',
-                fnRender: function(o, e) {
-                    return "<a href='/entity.html#id=" + o.aData.id + "'>" + o.aData.title + "</a>";
-                } 
+                field: 'title',
+                title: 'Company',
+                render: LobbyTransparency.renderEntity(),
+                width: '70%'
             },
-            { aTargets: [1], mDataProp: 'contactCountry' },
-            { aTargets: [2], mDataProp: 'expenditure' },
+            { field: 'contactCountry', title: 'Country of contact', width: '20%'},
+            { field: 'expenditure', title: 'Expenditure', render: LobbyTransparency.renderAmount()},
+
         ]
-      },
-      {
-        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-        "sPaginationType": "bootstrap",
-      }
-    );
+      );
   });
 </script>
