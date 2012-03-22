@@ -148,7 +148,7 @@ class GranoClient(object):
     def _getCollectionItem(self, collection, id, network=None, deep=False):
         submember = 'deep' if deep else None
         res, data = self._request('get', collection, network=network,
-            submember=submember)
+            member=id, submember=submember)
         return data() if res.ok else None
 
     def getEntity(self, id, network=None, deep=False):

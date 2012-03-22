@@ -30,8 +30,7 @@ EMPLOYMENT = {
             'type': 'string',
             'label': 'Role',
             'help': ''
-            }
-        },
+            },
         'position': {
             'type': 'string',
             'label': 'Position',
