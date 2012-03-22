@@ -1,3 +1,5 @@
 etl/data/*
 *.pyc
 *.DS_Store
+*.xml
+_site/*

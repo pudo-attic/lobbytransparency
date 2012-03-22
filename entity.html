@@ -1,0 +1,44 @@
+---
+layout: default
+title: ENTITY
+---
+
+<div id='entity'></div>
+
+{% raw %}
+<script id="entity-template" type="text/x-handlebars-template">
+    <h2 class="page-header">{{title}}</h2>
+    Roles: 
+    <ul>
+        {{#actsAsPerson}}<li>Person</li>{{/actsAsPerson}}
+        {{#actsAsRepresentative}}<li>Representative (registered interest)</li>{{/actsAsRepresentative}}
+        {{#actsAsClient}}<li>Client</li>{{/actsAsClient}}
+        {{#actsAsOrganisation}}<li>Organisation</li>{{/actsAsOrganisation}}
+    </ul>
+
+    <br/>
+    <h4>Debug (Raw Data)</h4>
+    <pre>{{raw}}</pre>
+</script>
+{% endraw %}
+
+<script>
+    $(function() {
+        hashChange = function() {
+            var query = document.location.hash.substring(1);
+            if(!query.length) {
+                alert("No ID specified!");
+            }
+            var params = LobbyTranspareny.parseQuery(query);
+            $.get('http://sna.pudo.org/api/1/eutr/entities/' + params.id + '/deep', function(data) {
+                $('title').html(data.title);
+                data.raw = JSON.stringify(data, null, '  ');
+                var template = Handlebars.compile($('#entity-template').html());
+                $('#entity').html(template(data));
+            }, 'jsonp');
+        };
+
+        $(window).bind( 'hashchange', function(e) { hashChange(); });
+        hashChange();
+    });
+</script>

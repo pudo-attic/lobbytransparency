@@ -1,0 +1,55 @@
+---
+layout: default
+title: Companies by expenditure
+---
+
+<h2 class="page-header">
+    TOP N companies (C II: companies and groups) spending most on lobbying
+</h2>
+
+<table id="table"
+    class="table table-striped table-condensed"
+    cellpadding="0" cellspacing="0" border="0">
+    <thead>
+        <tr>
+            <th data-field='title' width='60%'>Title</th>
+            <th data-field='title' width='20%'>Country</th>
+            <th data-field='expenditure'>Expenditure</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="dataTables_empty" i18n:msg="loading_data" colspan="5">
+                Loading data from server&hellip;
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<script src="/js/table.js"></script>
+<script>
+    $(function() {
+    window.table = new Grano.DataTable(
+      document.getElementById('table'),
+      {
+        source: 'http://sna.pudo.org/api/1',
+        query: 's1',
+        columnDefs: [
+            {
+                aTargets: [0],
+                mDataProp: 'title',
+                fnRender: function(o, e) {
+                    return "<a href='/entity.html#id=" + o.aData.id + "'>" + o.aData.title + "</a>";
+                } 
+            },
+            { aTargets: [1], mDataProp: 'contactCountry' },
+            { aTargets: [2], mDataProp: 'expenditure' },
+        ]
+      },
+      {
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap",
+      }
+    );
+  });
+</script>
