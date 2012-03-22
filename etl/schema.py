@@ -31,6 +31,12 @@ EMPLOYMENT = {
             'label': 'Role',
             'help': ''
             }
+        },
+        'position': {
+            'type': 'string',
+            'label': 'Position',
+            'help': ''
+            }
         }
     }
 
@@ -255,9 +261,9 @@ ACTOR = {
             },
 
 
-        'fdDirectfdCostsMax': {
+        'fdDirectRepCostsMax': {
             'type': 'integer',
-            'label': 'Direct costs (max)',
+            'label': 'Direct representation costs (max)',
             'help': ''
             },
         'fdType': {
@@ -300,9 +306,9 @@ ACTOR = {
             'label': 'Public financing (national)',
             'help': ''
             },
-        'fdDirectfdCostsMin': {
+        'fdDirectRepCostsMin': {
             'type': 'integer',
-            'label': 'Direct costs (max)',
+            'label': 'Direct representation costs (min)',
             'help': ''
             },
         'fdTotalBudget': {

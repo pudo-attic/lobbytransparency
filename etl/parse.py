@@ -149,10 +149,10 @@ def parse_rep(rep_el):
             src['amount'] = src_el.findtext(NS + 'amount')
             fd['otherCustomized'].append(src)
 
-    fd['directfdCostsMin'] = fi.findtext('.//' + NS +
-        'directfdresentationCosts//' + NS + 'min')
-    fd['directfdCostsMax'] = fi.findtext('.//' + NS +
-        'directfdresentationCosts//' + NS + 'max')
+    fd['directRepCostsMin'] = fi.findtext('.//' + NS +
+        'directRepresentationCosts//' + NS + 'min')
+    fd['directRepCostsMax'] = fi.findtext('.//' + NS +
+        'directRepresentationCosts//' + NS + 'max')
     fd['costMin'] = fi.findtext('.//' + NS +
         'cost//' + NS + 'min')
     fd['costMax'] = fi.findtext('.//' + NS +

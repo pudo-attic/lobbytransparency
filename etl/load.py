@@ -81,6 +81,7 @@ def load_persons(grano, engine, rep):
         rel['source'] = rep
         rel['target'] = psn
         rel['role'] = person['role']
+        rel['position'] = person['position']
         rel = grano.updateRelation(rel)
 
 
