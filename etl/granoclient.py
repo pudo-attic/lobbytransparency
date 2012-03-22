@@ -123,7 +123,7 @@ class GranoClient(object):
             params['filter'].append('%s:%s' % filter_)
         res, data = self._request('get', collection, params=params,
             network=network)
-        return data() if res.ok else []
+        return data().get('results', []) if res.ok else []
 
     def findEntities(self, type=None, network=None, filters=[], limit=100,
         offset=0):
