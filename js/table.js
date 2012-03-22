@@ -25,6 +25,7 @@
       this.options = $.extend(true, {}, this.options, options);
       this.element = $(element);
       this.table = this.element.dataTable($.extend(false, dataTableOptions, {
+        iDisplayLength: 20,
         bFilter: false,
         bSort: false,
         bLengthChange: false,
