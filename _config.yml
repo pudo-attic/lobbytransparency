@@ -1,4 +1,3 @@
-
 pygments: true
 auto: true
-source: demo
+exclude: etl archive.sh pip-requirements.txt queries.sql TODO.rst USAGE.rst
