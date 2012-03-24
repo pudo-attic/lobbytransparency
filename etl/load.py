@@ -1,8 +1,6 @@
 import logging
 import sqlaload as sl
 
-from granoclient import GranoClient
-
 import SETTINGS
 from schema import *
 from queries import *
@@ -13,16 +11,23 @@ log = logging.getLogger('load')
 PROPS = {}
 
 
-def canonical_name(grano, engine, title, type=ACTOR['name']):
+def canonical_actor(grano, engine, title):
     entity_table = sl.get_table(engine, 'entity')
     res = sl.find_one(engine, entity_table, etlFingerPrint=title)
-    if res is None or not 'canonicalName' in res or \
-        res['canonicalName'] is None or title == res['canonicalName']:
-        return title
-    nonCanon = grano.findEntity(type, title=title)
-    if nonCanon:
-        grano.deleteEntity(nonCanon)
-    return res['canonicalName']
+    #print res
+    if res is not None and \
+        'canonicalName' in res and \
+        res['canonicalName'] and \
+        title != res['canonicalName']:
+        nonCanon = grano.findEntity(ACTOR['name'], title=title)
+        if nonCanon:
+            grano.deleteEntity(nonCanon)
+        title = res['canonicalName']
+    print [title]
+    act = grano.findEntity(ACTOR['name'], title=title) or {}
+    act['title'] = title
+    act['type'] = ACTOR['name']
+    return act
 
 
 def replace_relation(list, attribute, rel, match=['type']):
@@ -63,6 +68,10 @@ def get_financial_data(engine, rep):
     fds = list(sl.find(engine, sl.get_table(engine, 'financialData'),
         representativeEtlId=rep['etlId']))
     fd = max(fds, key=lambda f: f.get('endDate'))
+
+    #from pprint import pprint
+    #pprint(fd)
+
     for key, value in fd.items():
         if key in [u'totalBudget', u'turnoverMin', u'costAbsolute', u'publicFinancingNational',
             u'otherSourcesDonation', u'eurSourcesProcurement', u'costMax', u'eurSourcesGrants',
@@ -79,11 +88,8 @@ def get_financial_data(engine, rep):
 def load_persons(grano, engine, rep):
     for person in sl.find(engine, sl.get_table(engine, 'person'),
         representativeEtlId=rep['etlId']):
-        del person['id']
-        title = canonical_name(grano, engine, person['etlFingerPrint'])
-        psn = grano.findEntity(ACTOR['name'], title=title) or {}
-        psn['type'] = ACTOR['name']
-        psn['title'] = title
+        #del person['id']
+        psn = canonical_actor(grano, engine, person['etlFingerPrint'])
         psn['firstName'] = person['firstName']
         psn['lastName'] = person['lastName']
         psn['salutation'] = person['title']
@@ -105,11 +111,8 @@ def load_persons(grano, engine, rep):
 def load_organisations(grano, engine, rep):
     for org in sl.find(engine, sl.get_table(engine, 'organisation'),
         representativeEtlId=rep['etlId']):
-        del org['id']
-        title = canonical_name(grano, engine, org['name'])
-        ent = grano.findEntity(ACTOR['name'], title=title) or {}
-        ent['type'] = ACTOR['name']
-        ent['title'] = title
+        #del org['id']
+        ent = canonical_actor(grano, engine, org['name'])
         ent['members'] = int(float(org['numberOfMembers'] or 0))
         ent['actsAsOrganisation'] = True
 
@@ -125,11 +128,8 @@ def load_clients(grano, engine, rep):
     for fdto in sl.find(engine, sl.get_table(engine, 'financialDataTurnover'),
         representativeEtlId=rep['etlId']):
         del fdto['id']
-        title = canonical_name(grano, engine, fdto['name'])
-        client = grano.findEntity(ACTOR['name'], title=title) or {}
+        client = canonical_actor(grano, engine, fdto['name'])
         client.update(fdto)
-        client['type'] = ACTOR['name']
-        client['title'] = title
         client['actsAsClient'] = True
 
         rel = find_relation(rep, TURNOVER['name'], source=client.get('id'))
@@ -172,21 +172,18 @@ def load_action_fields(grano, engine, rep):
     return load_proptable(grano, engine, rep, 'actionField', ACTION_FIELD)
 
 
-def load_representatives(grano, engine):
+def load(grano, engine):
     for rep in sl.find(engine, sl.get_table(engine, 'representative')):
         del rep['id']
         # TODO: name resolution
-        title = canonical_name(grano, engine, rep['originalName'])
-        rep_ent = grano.findEntity(ACTOR['name'], title=title) or {}
+        rep_ent = canonical_actor(grano, engine, rep['originalName'])
         if 'id' in rep_ent:
             rep_ent = grano.getEntity(rep_ent['id'], deep=True)
         #if not SETTINGS.FULL and rep_ent['etlId'] == rep['etlId']:
         #    continue
         rep_ent.update(rep)
-        rep_ent['type'] = ACTOR['name']
         rep_ent['actsAsRepresentative'] = True
         rep_ent['members'] = int(float(rep['members']))
-        rep_ent['title'] = title
         rep_ent['incoming'] = rep_ent.get('incoming', [])
         rep_ent['outgoing'] = rep_ent.get('outgoing', [])
         rep_ent = load_clients(grano, engine, rep_ent)
@@ -201,10 +198,7 @@ def load_representatives(grano, engine):
         grano.updateEntity(rep_ent)
 
 
-def load(engine, grano):
-    load_representatives(grano, engine)
-
 if __name__ == '__main__':
     engine = sl.connect(SETTINGS.ETL_URL)
     grano = make_grano()
-    load(engine, grano)
+    load(grano, engine)

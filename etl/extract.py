@@ -98,7 +98,7 @@ def load_ap(ap, engine):
     if len(orgs):
         org = max(orgs, key=lambda o: o['lastUpdateDate'])
         childBase = {'representativeEtlId': org['etlId'],
-                 'representativeUpdateDate': org['lastUpdateDate']}
+                     'representativeUpdateDate': org['lastUpdateDate']}
         load_person(ap, 'accredited', childBase, engine)
     else:
         print ap
