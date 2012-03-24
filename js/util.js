@@ -35,7 +35,7 @@ cur.renderAmount = function(foo) {
     };
 };
 
-cur.makeTable = function(elem, queryName, columns) {
+cur.makeTable = function(elem, queryName, columns, options) {
     var headers = elem.find('thead tr');
     var columnDefs = [];
     headers.empty();
@@ -52,7 +52,11 @@ cur.makeTable = function(elem, queryName, columns) {
       {
         source: LobbyTransparency.apiUrl,
         query: queryName,
-        columnDefs: columnDefs
+        columnDefs: columnDefs,
+        params: _.extend({
+            limit: 20, 
+            offset: 0
+        }, options)
       },
       {
         "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",

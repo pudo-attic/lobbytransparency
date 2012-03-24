@@ -14,7 +14,7 @@
       source: 'http://localhost:5000/api/1',
       dataset: 'eutr',
       query: 'test',
-      defaultParams: {
+      params: {
         limit: 20,
         offset: 0
       }
@@ -51,10 +51,10 @@
         o = params[i];
         p[o.name] = o.value;
       }
-      var newparams = $.extend(true, {}, this.options.defaultParams);
+      var newparams = $.extend(true, {}, this.options.params);
       newparams.offset = p.iDisplayStart;
       newparams.limit = p.iDisplayLength;
-      newparams.q = p.sSearch;
+      //newparams.q = p.sSearch;
       var apiUrl = this.options.source + this.options.dataset + '/queries/';
       apiUrl = apiUrl + this.options.query + '/run';
       var rq = $.get(apiUrl, newparams, function(d) {}, 'jsonp');
