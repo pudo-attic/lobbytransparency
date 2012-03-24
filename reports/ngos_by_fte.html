@@ -1,30 +1,31 @@
 ---
 layout: default
-title: Companies by expenditure
+title: NGOs by lobbists
 ---
 
 <h2 class="page-header">
-    TOP N companies (C II: companies and groups) spending most on lobbying
+    TOP N NGOs (C III) with the most lobbyists employed  
 </h2>
 
 {% include datatable.html %}
 
 <script>
     $(function() {
-    window.table = LobbyTransparency.makeTable($('#table'), 'actor_by_exp',
+    window.table = LobbyTransparency.makeTable($('#table'), 'actor_by_fte',
         [
             {
                 field: 'title',
-                title: 'Company',
+                title: 'NGO',
                 render: LobbyTransparency.renderEntity(),
-                width: '70%'
+                width: '50%'
             },
             { field: 'contactCountry', title: 'Country of contact', width: '20%'},
-            { field: 'expenditure', title: 'Expenditure', render: LobbyTransparency.renderAmount()},
+            { field: 'members', title: 'Representatives'},
+            { field: 'accreditations', title: 'EP Passes'},
 
         ],
         {
-            subCategoryId: 21
+            subCategoryId: 31
         }
       );
   });

@@ -1,0 +1,23 @@
+---
+layout: default
+title: Represenatation by org type
+---
+
+<h2 class="page-header">
+    Number of lobbyists employed by different categories of interests (FTE)
+</h2>
+
+{% include datatable.html %}
+
+<script>
+    $(function() {
+    window.table = LobbyTransparency.makeTable($('#table'), 'fte_by_subcategory',
+        [
+            { field: 'subCategory', title: 'Category', width: '60%'},
+            { field: 'members', title: 'Lobbyists'},
+            { field: 'accreditations', title: 'EP Passes'},
+
+        ]
+      );
+  });
+</script>

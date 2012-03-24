@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Companies by expenditure
+title: Trade associations by expenditure
 ---
 
 <h2 class="page-header">
-    TOP N companies (C II: companies and groups) spending most on lobbying
+    TOP N associations (C II: trade, business ans professional associations) spending most on lobbying
 </h2>
 
 {% include datatable.html %}
@@ -15,7 +15,7 @@ title: Companies by expenditure
         [
             {
                 field: 'title',
-                title: 'Company',
+                title: 'Associations',
                 render: LobbyTransparency.renderEntity(),
                 width: '70%'
             },
@@ -24,7 +24,7 @@ title: Companies by expenditure
 
         ],
         {
-            subCategoryId: 21
+            subCategoryId: 24
         }
       );
   });

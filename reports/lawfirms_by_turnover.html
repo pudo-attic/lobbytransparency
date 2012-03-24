@@ -1,31 +1,29 @@
 ---
 layout: default
-title: Companies by expenditure
+title: Law firms by turnover
 ---
 
 <h2 class="page-header">
-    TOP N companies (C II: companies and groups) spending most on lobbying
+    TOP N law firms (C I) with the biggest lobbying turnover
 </h2>
 
 {% include datatable.html %}
 
 <script>
     $(function() {
-    window.table = LobbyTransparency.makeTable($('#table'), 'actor_by_exp',
+    window.table = LobbyTransparency.makeTable($('#table'), 'actor_by_turnover',
         [
             {
                 field: 'title',
-                title: 'Company',
+                title: 'Law firms',
                 render: LobbyTransparency.renderEntity(),
                 width: '70%'
             },
             { field: 'contactCountry', title: 'Country of contact', width: '20%'},
-            { field: 'expenditure', title: 'Expenditure', render: LobbyTransparency.renderAmount()},
+            { field: 'turnover', title: 'Turnover', render: LobbyTransparency.renderAmount()},
 
         ],
-        {
-            subCategoryId: 21
-        }
+        {subCategoryId: 11}
       );
   });
 </script>
