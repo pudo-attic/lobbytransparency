@@ -56,7 +56,7 @@
       newparams.limit = p.iDisplayLength;
       newparams.q = p.sSearch;
       var apiUrl = this.options.source + this.options.dataset + '/queries/';
-      apiUrl = apiUrl + this.options.query;
+      apiUrl = apiUrl + this.options.query + '/run';
       var rq = $.get(apiUrl, newparams, function(d) {}, 'jsonp');
       rq.fail(ajaxError("Source request failed. Params: " + (JSON.stringify(p))));
       rq.then(function(data) {

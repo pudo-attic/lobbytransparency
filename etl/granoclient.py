@@ -82,6 +82,10 @@ class GranoClient(object):
             subcollection=type_, network=network)
         return data() if res.ok else []
 
+    def listQueries(self, network=None):
+        res, data = self._request('get', 'queries', network=network)
+        return data().get('results', []) if res.ok else []
+
     def listEntitySchemata(self, network=None):
         return self.listSchemata('entity', network=network)
 
@@ -145,10 +149,11 @@ class GranoClient(object):
                                 limit=1)
         return res.pop() if res else None
 
-    def _getCollectionItem(self, collection, id, network=None, deep=False):
-        submember = 'deep' if deep else None
+    def _getCollectionItem(self, collection, id, network=None, deep=False,
+                           submember=None, params=None):
+        submember = 'deep' if deep else submember
         res, data = self._request('get', collection, network=network,
-            member=id, submember=submember)
+            member=id, submember=submember, params=params)
         return data() if res.ok else None
 
     def getEntity(self, id, network=None, deep=False):
@@ -156,6 +161,13 @@ class GranoClient(object):
 
     def getRelation(self, id, network=None, deep=False):
         return self._getCollectionItem('relations', id, network=network, deep=deep)
+
+    def getQuery(self, name, network=None, deep=False):
+        return self._getCollectionItem('queries', name, network=network)
+
+    def runQuery(self, name, network=None, **kw):
+        return self._getCollectionItem('queries', name, network=network,
+            submember='run', params=kw)
 
     def _createCollectionItem(self, collection, obj, network=None):
         res, data = self._request('post', collection, network=network,
@@ -167,6 +179,9 @@ class GranoClient(object):
 
     def createRelation(self, obj, network=None):
         return self._createCollectionItem('relations', obj, network=network)
+
+    def createQuery(self, obj, network=None):
+        return self._createCollectionItem('queries', obj, network=network)
 
     def _updateCollectionItem(self, collection, obj, network=None):
         if not 'id' in obj:
@@ -181,6 +196,11 @@ class GranoClient(object):
     def updateRelation(self, obj, network=None):
         return self._updateCollectionItem('relations', obj, network=network)
 
+    def updateQuery(self, obj, network=None):
+        res, data = self._request('put', 'queries', network=network,
+            member=obj['name'], data=obj)
+        return data() if res.ok else None
+
     def _deleteCollectionItem(self, collection, id, network=None):
         if isinstance(id, dict):
             id = id.get('id')
@@ -193,3 +213,6 @@ class GranoClient(object):
 
     def deleteRelation(self, id, network=None):
         return self._deleteCollectionItem('relations', id, network=network)
+
+    def deleteQuery(self, name, network=None):
+        return self._deleteCollectionItem('queries', name, network=network)

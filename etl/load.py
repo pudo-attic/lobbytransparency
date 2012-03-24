@@ -5,6 +5,7 @@ from granoclient import GranoClient
 
 import SETTINGS
 from schema import *
+from queries import *
 
 log = logging.getLogger('load')
 
@@ -29,6 +30,12 @@ def create_network(grano):
             grano.updateSchema(type_, schema)
         else:
             grano.createSchema(type_, schema)
+
+    for query in QUERIES:
+        if grano.getQuery(query['name']):
+            grano.updateQuery(query)
+        else:
+            grano.createQuery(query)
 
 
 def canonical_name(grano, engine, title, type=ACTOR['name']):
