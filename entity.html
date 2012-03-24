@@ -225,7 +225,6 @@ title: Loading...
                     function(e) { 
                         e.target.url = LobbyTransparency.entityUrl(e.target.id); 
                         e.target.position = e.position;
-                        console.log(e);
                         return e.target; 
                     }));
                 data.legal = _.first(_.map(_.filter(data.outgoing, 
@@ -251,6 +250,7 @@ title: Loading...
 
                 console.log(data);
                 $('#entity').html(templates[data.type](data));
+                
             }, 'jsonp');
         };
 

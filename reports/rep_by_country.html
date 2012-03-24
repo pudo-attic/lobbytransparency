@@ -1,0 +1,22 @@
+---
+layout: default
+title: Registered representatives per country
+---
+
+<h2 class="page-header">
+    Registered representatives per country
+</h2>
+
+{% include datatable.html %}
+
+<script>
+    $(function() {
+    window.table = LobbyTransparency.makeTable($('#table'), 'rep_by_country',
+        [
+            { field: 'contactCountry', title: 'Country of contact', width: '80%'},
+            { field: 'number', title: 'Number'},
+
+        ]
+      );
+  });
+</script>
