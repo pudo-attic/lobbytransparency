@@ -47,6 +47,8 @@ def transform(engine):
     log.info("Performing micro-transforms...")
     code_categories(engine)
     code_subcategories(engine)
+    from countries import transform_countries
+    transform_countries(engine)
 
 if __name__ == '__main__':
     engine = sl.connect(SETTINGS.ETL_URL)

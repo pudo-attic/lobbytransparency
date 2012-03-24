@@ -1,31 +1,61 @@
-from urllib import urlopen 
-
-from recon.local import CSVLocalEndpoint
 import sqlaload as sl
+import csv
 
-from common import integrate_recon
+import SETTINGS
 
 COUNTRIES_URL = 'countrycodes.csv'
 
-def integrate_countries(engine):
-    fh = urlopen(COUNTRIES_URL)
-    uri = lambda r: r['ISO-2']
-    endpoint = CSVLocalEndpoint(fh, 'Country', uri_maker=uri)
-    integrate_recon(engine, sl.get_table(engine, 'representative'), 
-                    endpoint.reconcile,
-                    'contactCountry',
-                    'contactCountryName', 'contactCountryCode',
-                    memory_name='recon_countryNames')
-    integrate_recon(engine, sl.get_table(engine, 'countryOfMember'), 
-                    endpoint.reconcile,
-                    'countryOfMember',
-                    'countryOfMemberName', 'countryOfMemberCode',
-                    memory_name='recon_countryNames')
+
+def read_reference():
+    fh = open(COUNTRIES_URL, 'rb')
+    reader = csv.DictReader(fh)
+    data = []
+    for row in reader:
+        data.append(row)
+    fh.close()
+    return data
+
+
+def write_reference(data):
+    fh = open(COUNTRIES_URL, 'wb')
+    columns = set()
+    for row in data:
+        columns.update(row.keys())
+    writer = csv.DictWriter(fh, columns)
+    writer.writerow(dict(zip(columns, columns)))
+    for row in data:
+        writer.writerow(row)
+    fh.close()
+
+
+def update_reference(engine, data, table_name, col):
+    table = sl.get_table(engine, table_name)
+    for row in sl.distinct(engine, table, col):
+        print row
+        matched = False
+        for ref in data:
+            country = ref['country'].decode('utf-8')
+            if ref['euname'] == row[col] or \
+                country.upper() == row[col].upper():
+                if not len(ref['euname']):
+                    ref['euname'] = row[col]
+                matched = True
+                sl.upsert(engine, table, {
+                        col: country,
+                        col + 'Code': ref['iso2']},
+                        [col])
+        if not matched:
+            print row
+    return data
+
+
+def transform_countries(engine):
+    data = read_reference()
+    data = update_reference(engine, data, 'representative', 'contactCountry')
+    data = update_reference(engine, data, 'countryOfMember', 'countryOfMember')
+    write_reference(data)
 
 if __name__ == '__main__':
-    import sys
-    assert len(sys.argv)==2, "Usage: %s [engine-url]"
-    engine = sl.connect(sys.argv[1])
-    integrate_countries(engine)
-
-
+    engine = sl.connect(SETTINGS.ETL_URL)
+    #integrate_countries(engine)
+    transform_countries(engine)

@@ -11,6 +11,7 @@ import SETTINGS
 
 log = logging.getLogger('load')
 
+
 def update_entities(engine, file_name):
     log.info("Updateing entities reference sheet: %s", file_name)
     data = {}
@@ -61,12 +62,6 @@ def create_entities(engine):
             sl.upsert(engine, table, entity, ['etlFingerPrint', 'etlTable'])
 
 
-def recon_companies(engine):
-    integrate_recon(engine, sl.get_table(engine, 'entity'),
-                    company, 'etlFingerPrint',
-                    'canonicalName', 'canonicalURI')
-
-
 def cluster(engine):
     for row in sl.all(engine, sl.get_table(engine, 'entity')):
         print normalize_text(row['etlFingerPrint']).encode('utf-8')
@@ -76,5 +71,4 @@ if __name__ == '__main__':
     engine = sl.connect(SETTINGS.ETL_URL)
     create_entities(engine)
     update_entities(engine, 'entities.csv')
-    #recon_companies(engine)
     #cluster(engine)
