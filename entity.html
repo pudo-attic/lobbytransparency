@@ -7,14 +7,15 @@ title: Loading...
 
 {% raw %}
 <script id="actor" type="text/x-handlebars-template">
-    <h2 class="page-header">{{title}} <small>{{acronym}}</small></h2>
-    Roles: 
-    <ul>
-        {{#actsAsPerson}}<li>Person</li>{{/actsAsPerson}}
-        {{#actsAsRepresentative}}<li>Representative (registered interest)</li>{{/actsAsRepresentative}}
-        {{#actsAsClient}}<li>Client</li>{{/actsAsClient}}
-        {{#actsAsOrganisation}}<li>Organisation</li>{{/actsAsOrganisation}}
-    </ul>
+    <h2 class="page-header">{{title}} 
+        <small>
+            {{#actsAsPerson}}<span class='label'>Person</span>{{/actsAsPerson}}
+            {{#actsAsRepresentative}}<span class='label'>Registrant</span>{{/actsAsRepresentative}}
+            {{#actsAsClient}}<span class='label'>Client</span>{{/actsAsClient}}
+            {{#actsAsOrganisation}}<span class='label'>Org Member</span>{{/actsAsOrganisation}}
+        </small>
+    </h2>
+    
 
     <div class='row'>
         <div class='span4'>
@@ -93,7 +94,7 @@ title: Loading...
             <table class="table table-striped table-condensed">
                 <tr>
                     <th colspan="2">Expenditure</th>
-                    <th width="20%"></th>
+                    <th width="30%"></th>
                 </tr>
                 <tr>
                     <td colspan="2">Cost</td>
@@ -162,6 +163,39 @@ title: Loading...
             </table>
             {{/if}}
 
+            {{#if employers}}
+            <h3>Employers</h3>
+            <table class="table table-striped table-condensed">
+                {{#employers}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                    </tr>
+                {{/employers}}
+            </table>
+            {{/if}}
+
+            {{#if memberships}}
+            <h3>Memberships</h3>
+            <table class="table table-striped table-condensed">
+                {{#memberships}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                    </tr>
+                {{/memberships}}
+            </table>
+            {{/if}}
+
+            {{#if memberorgs}}
+            <h3>Member Organisations</h3>
+            <table class="table table-striped table-condensed">
+                {{#memberorgs}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                    </tr>
+                {{/memberorgs}}
+            </table>
+            {{/if}}
+
             {{#if accreditations}}
             <h3>European Parliament Accreditations</h3>
             <table class="table table-striped table-condensed">
@@ -178,6 +212,37 @@ title: Loading...
             </table>
             {{/if}}
 
+            {{#if firms}}
+            <h3>Hired Representatives</h3>
+            <table class="table table-striped table-condensed">
+                <tr>
+                    <th>Firm</th>
+                    <th width="30%">Expenditure</th>
+                </tr>
+                {{#firms}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                        <td>{{exp}}</td>
+                    </tr>
+                {{/firms}}
+            </table>
+            {{/if}}
+
+            {{#if clients}}
+            <h3>Clients</h3>
+            <table class="table table-striped table-condensed">
+                <tr>
+                    <th>Client</th>
+                    <th width="30%">Expenditure</th>
+                </tr>
+                {{#clients}}
+                    <tr>
+                        <td><a href="{{url}}">{{title}}</a></td>
+                        <td>{{exp}}</td>
+                    </tr>
+                {{/clients}}
+            </table>
+            {{/if}}
 
             {{#goals}}
                 <h3>Goals</h3>
@@ -189,10 +254,6 @@ title: Loading...
             {{/networking}}
         </div>
     </div>
-
-    <br/>
-    <h4>Debug (Raw Data)</h4>
-    <pre>{{raw}}</pre>
 </script>
 {% endraw %}
 
@@ -241,6 +302,43 @@ title: Loading...
                         e.target.url = LobbyTransparency.entityUrl(e.target.id);
                         e.target.position = e.position;
                         return e.target; 
+                    });
+
+                data.employers = _.uniq(_.map(_.filter(data.incoming, 
+                    function(e) { return e.type=='employment'; }),
+                    function(e) { 
+                        e.source.url = LobbyTransparency.entityUrl(e.source.id);
+                        return e.source; 
+                    }));
+
+                data.firms = _.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='turnover'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        e.target.exp = LobbyTransparency.numRange(e.min, e.max);
+                        return e.target; 
+                    });
+
+                data.clients = _.map(_.filter(data.incoming, 
+                    function(e) { return e.type=='turnover'; }),
+                    function(e) { 
+                        e.source.url = LobbyTransparency.entityUrl(e.source.id);
+                        e.source.exp = LobbyTransparency.numRange(e.min, e.max);
+                        return e.source; 
+                    });
+
+                data.memberorgs = _.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='member'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        return e.target; 
+                    });
+
+                data.memberships = _.map(_.filter(data.incoming, 
+                    function(e) { return e.type=='member'; }),
+                    function(e) { 
+                        e.source.url = LobbyTransparency.entityUrl(e.source.id);
+                        return e.source; 
                     });
 
                 data.fdCost = LobbyTransparency.numRange(data.fdCostMin, data.fdCostMax, data.fdCostAbsolute);
