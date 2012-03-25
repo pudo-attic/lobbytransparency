@@ -153,7 +153,7 @@ def load_action_fields(grano, engine, rep):
     return load_proptable(grano, engine, rep, 'actionField', ACTION_FIELD)
 
 
-def load(grano, engine):
+def load(engine, grano):
     for rep in sl.find(engine, sl.get_table(engine, 'representative')):
         del rep['id']
         rep_ent = canonical_actor(grano, engine, rep['originalName'])
@@ -182,4 +182,4 @@ def load(grano, engine):
 if __name__ == '__main__':
     engine = sl.connect(SETTINGS.ETL_URL)
     grano = make_grano()
-    load(grano, engine)
+    load(engine, grano)
