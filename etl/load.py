@@ -14,7 +14,6 @@ PROPS = {}
 def canonical_actor(grano, engine, title):
     entity_table = sl.get_table(engine, 'entity')
     res = sl.find_one(engine, entity_table, etlFingerPrint=title)
-    #print res
     if res is not None and \
         'canonicalName' in res and \
         res['canonicalName'] and \
@@ -23,55 +22,37 @@ def canonical_actor(grano, engine, title):
         if nonCanon:
             grano.deleteEntity(nonCanon)
         title = res['canonicalName']
-    print [title]
     act = grano.findEntity(ACTOR['name'], title=title) or {}
+    print [title]
     act['title'] = title
     act['type'] = ACTOR['name']
     return act
 
 
-def replace_relation(list, attribute, rel, match=['type']):
-    new_list = []
-    found = False
-    for r in list:
-        checks = [r.get(m) == rel.get(m) for m in match]
-        if (r[attribute].get('id') == rel[attribute].get('id') or \
-            r[attribute].get('title') == rel[attribute].get('title')) \
-            and not False in checks:
-            found = True
-            new_list.append(rel)
-        else:
-            new_list.append(r)
-    if not found:
-        new_list.append(rel)
+def replace_relation(lst, attribute, rel, match=['type']):
+    new_list = [rel]
+    cmp_ = [rel.get(attribute, {}).get('title')] + [rel.get(m) for m in match]
+    for r in list(lst):
+        if cmp_ == [r[attribute]['title']] + [r.get(m) for m in match]:
+            continue
+        new_list.append(r)
     return new_list
 
 
-def find_relation(rep, type, source=None, target=None):
-    key = lambda e: e.get('id') if isinstance(e, dict) else e
-    if source is not None:
-        for rel in rep['incoming']:
-            if rel['type'] != type:
-                continue
-            if key(rel['source']) == source:
-                return rel
-    if target is not None:
-        for rel in rep['outgoing']:
-            if rel['type'] != type:
-                continue
-            if key(rel['target']) == target:
-                return rel
-    return {}
+def find_relation(lst, attribute, other, props):
+    p = props.items()
+    cmp_ = [other.get('title')] + [v for k, v in p]
+    for rel in lst:
+        if cmp_ == [rel.get(attribute, {}).get('title')] + \
+            [rel.get(k) for k, v in p]:
+            return rel
+    return props
 
 
 def get_financial_data(engine, rep):
     fds = list(sl.find(engine, sl.get_table(engine, 'financialData'),
         representativeEtlId=rep['etlId']))
     fd = max(fds, key=lambda f: f.get('endDate'))
-
-    #from pprint import pprint
-    #pprint(fd)
-
     for key, value in fd.items():
         if key in [u'totalBudget', u'turnoverMin', u'costAbsolute', u'publicFinancingNational',
             u'otherSourcesDonation', u'eurSourcesProcurement', u'costMax', u'eurSourcesGrants',
@@ -88,7 +69,6 @@ def get_financial_data(engine, rep):
 def load_persons(grano, engine, rep):
     for person in sl.find(engine, sl.get_table(engine, 'person'),
         representativeEtlId=rep['etlId']):
-        #del person['id']
         psn = canonical_actor(grano, engine, person['etlFingerPrint'])
         psn['firstName'] = person['firstName']
         psn['lastName'] = person['lastName']
@@ -97,11 +77,10 @@ def load_persons(grano, engine, rep):
         psn['accreditationStartDate'] = person.get('accreditationStartDate')
         psn['actsAsPerson'] = True
 
-        rel = find_relation(rep, EMPLOYMENT['name'], target=psn.get('id'))
-        rel['type'] = EMPLOYMENT['name']
+        rel = find_relation(rep['outgoing'], 'target', psn,
+            {'type': EMPLOYMENT['name'], 'role': person['role']})
         rel['source'] = rep.get('id')
         rel['target'] = psn
-        rel['role'] = person['role']
         rel['position'] = person['position']
         rep['outgoing'] = replace_relation(rep['outgoing'], 'target', rel,
             match=['type', 'role'])
@@ -111,12 +90,12 @@ def load_persons(grano, engine, rep):
 def load_organisations(grano, engine, rep):
     for org in sl.find(engine, sl.get_table(engine, 'organisation'),
         representativeEtlId=rep['etlId']):
-        #del org['id']
         ent = canonical_actor(grano, engine, org['name'])
         ent['members'] = int(float(org['numberOfMembers'] or 0))
         ent['actsAsOrganisation'] = True
 
-        rel = find_relation(rep, MEMBERSHIP['name'], target=ent.get('id'))
+        rel = find_relation(rep['outgoing'], 'target', ent,
+            {'type': MEMBERSHIP['name']})
         rel['type'] = MEMBERSHIP['name']
         rel['source'] = rep.get('id')
         rel['target'] = ent
@@ -132,7 +111,8 @@ def load_clients(grano, engine, rep):
         client.update(fdto)
         client['actsAsClient'] = True
 
-        rel = find_relation(rep, TURNOVER['name'], source=client.get('id'))
+        rel = find_relation(rep['incoming'], 'source', client,
+            {'type': TURNOVER['name']})
         rel['type'] = TURNOVER['name']
         rel['source'] = client
         rel['target'] = rep.get('id')
@@ -156,7 +136,8 @@ def load_proptable(grano, engine, rep, prop, schema):
                 int_ = grano.updateEntity(int_)
             PROPS[(prop, row[prop])] = int_
 
-        rel = find_relation(rep, TOPIC['name'], source=int_.get('id'))
+        rel = find_relation(rep['outgoing'], 'target', int_,
+            {'type': TOPIC['name']})
         rel['type'] = TOPIC['name']
         rel['source'] = rep.get('id')
         rel['target'] = int_
@@ -175,7 +156,6 @@ def load_action_fields(grano, engine, rep):
 def load(grano, engine):
     for rep in sl.find(engine, sl.get_table(engine, 'representative')):
         del rep['id']
-        # TODO: name resolution
         rep_ent = canonical_actor(grano, engine, rep['originalName'])
         if 'id' in rep_ent:
             rep_ent = grano.getEntity(rep_ent['id'], deep=True)
@@ -196,6 +176,7 @@ def load(grano, engine):
         #from pprint import pprint
         #pprint(rep_ent)
         grano.updateEntity(rep_ent)
+        #raise ValueError()
 
 
 if __name__ == '__main__':
