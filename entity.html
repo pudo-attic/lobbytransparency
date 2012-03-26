@@ -83,7 +83,7 @@ title: Loading...
         </div>
         <div class='span8'>
             {{#activities}}
-                <p>{{preformatted this}}</p>
+                <p>{{longtext this}}</p>
             {{/activities}}
 
             {{#if fdType}}
@@ -246,11 +246,11 @@ title: Loading...
 
             {{#goals}}
                 <h3>Goals</h3>
-                <p>{{preformatted this}}</p>
+                <p>{{longtext this}}</p>
             {{/goals}}
             {{#networking}}
                 <h3>Networking</h3>
-                <p>{{preformatted this}}</p>
+                <p>{{longtext this}}</p>
             {{/networking}}
         </div>
     </div>
@@ -348,7 +348,12 @@ title: Loading...
 
                 console.log(data);
                 $('#entity').html(templates[data.type](data));
-                
+                $('.longtext .abstract a').click(function(e) {
+                    var elem = $(e.target).parents('.longtext');
+                    elem.find('.abstract').hide();
+                    elem.find('.full').slideDown();
+                    return false;
+                });
             }, 'jsonp');
         };
 

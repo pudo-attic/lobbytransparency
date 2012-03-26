@@ -54,7 +54,7 @@ cur.makeTable = function(elem, queryName, columns, options) {
         query: queryName,
         columnDefs: columnDefs,
         params: _.extend({
-            limit: 20, 
+            limit: 20,
             offset: 0
         }, options)
       },
@@ -81,6 +81,18 @@ cur.numRange = function(min, max, abs) {
     }
     return new Handlebars.SafeString("<span class='num'>" + num + " &euro;</span>");
 };
+
+Handlebars.registerHelper('longtext', function(text) {
+  if (text.length < 160) {
+    return text.replace(/\n/g, '<br/>\n');
+  }
+  abstract = text.substring(0, 160);
+  text = text.replace(/\n/g, '<br/>\n');
+  snippet = "<span class='longtext'><span class='abstract'>" + abstract + "... ";
+  snippet += "<a href='#'>More...</a></span>";
+  snippet += "<span class='full'>" + text + "</span></span>";
+  return new Handlebars.SafeString(snippet);
+});
 
 Handlebars.registerHelper('preformatted', function(text) {
   return new Handlebars.SafeString(text.replace(/\n/g, '<br/>\n'));
