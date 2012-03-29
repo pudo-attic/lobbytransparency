@@ -5,7 +5,7 @@ from recon import company
 import sqlaload as sl
 
 from common import integrate_recon
-from normalize import normalize_text
+from normalize import normalize_text, reverse_normalize
 
 import SETTINGS
 
@@ -13,7 +13,7 @@ log = logging.getLogger('load')
 
 
 def update_entities(engine, file_name):
-    log.info("Updateing entities reference sheet: %s", file_name)
+    log.info("Updating entities reference sheet: %s", file_name)
     data = {}
     if os.path.exists(file_name):
         fh = open(file_name, 'rb')
@@ -31,6 +31,8 @@ def update_entities(engine, file_name):
     table = sl.get_table(engine, 'entity')
     for row in sl.all(engine, table):
         fp = row['etlFingerPrint']
+        if fp is None:
+            continue
         if not row.get('canonicalName'):
             row['canonicalName'] = row['etlFingerPrint']
         entity = data.get(fp)
@@ -41,6 +43,9 @@ def update_entities(engine, file_name):
             out = row.copy()
             del out['id']
             sl.upsert(engine, table, out, ['etlFingerPrint'])
+        cn = row['canonicalName']
+        row['normalizedForm'] = normalize_text(cn)
+        row['reverseForm'] = reverse_normalize(cn)
         if writer is None:
             writer = csv.DictWriter(fh, row.keys())
             writer.writerow(dict(zip(row.keys(), row.keys())))

@@ -31,17 +31,20 @@ SUBCATEGORIES = {
     u'Other public or mixed entities, etc.': 62
     }
 
+
 def code_categories(engine):
     table = sl.get_table(engine, 'representative')
     for cat in sl.distinct(engine, table, 'mainCategory'):
         cat['mainCategoryId'] = CATEGORIES[cat['mainCategory']]
         sl.upsert(engine, table, cat, ['mainCategory'])
 
+
 def code_subcategories(engine):
     table = sl.get_table(engine, 'representative')
     for cat in sl.distinct(engine, table, 'subCategory'):
         cat['subCategoryId'] = SUBCATEGORIES[cat['subCategory']]
         sl.upsert(engine, table, cat, ['subCategory'])
+
 
 def transform(engine):
     log.info("Performing micro-transforms...")
