@@ -18,7 +18,7 @@ AP = '{%s}' % _AP
 
 
 def dateconv(ds):
-    return datetime.strptime(ds, "%Y-%m-%dT%H:%M:%S.%f+01:00")
+    return datetime.strptime(ds.split("+")[0], "%Y-%m-%dT%H:%M:%S.%f")
 
 
 def ap_dateconv(ds):
