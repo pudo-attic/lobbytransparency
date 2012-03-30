@@ -42,7 +42,9 @@ def code_categories(engine):
 def code_subcategories(engine):
     table = sl.get_table(engine, 'representative')
     for cat in sl.distinct(engine, table, 'subCategory'):
-        cat['subCategoryId'] = SUBCATEGORIES[cat['subCategory']]
+        cat['subCategoryId'] = SUBCATEGORIES.get(cat['subCategory'])
+        if cat['subCategoryId'] is None:
+            print "Unkown Subcategory", [cat['subCategory']]
         sl.upsert(engine, table, cat, ['subCategory'])
 
 
