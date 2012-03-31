@@ -204,6 +204,7 @@ def parse(file_name):
     doc = etree.parse(file_name)
     for rep_el in doc.findall('//' + NS + 'interestRepresentativeNew'):
         rep = parse_rep(rep_el)
+        #pprint(rep)
         yield rep
 
 

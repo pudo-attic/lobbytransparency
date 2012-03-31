@@ -20,6 +20,11 @@ def canonical_actor(grano, engine, title):
         title != res['canonicalName']:
         nonCanon = grano.findEntity(ACTOR['name'], title=title)
         if nonCanon:
+            ent = grano.getEntity(nonCanon['id'], deep=True)
+            for rel in ent.get('incoming', []):
+                grano.deleteRelation(rel)
+            for rel in ent.get('outgoing', []):
+                grano.deleteRelation(rel)
             grano.deleteEntity(nonCanon)
         title = res['canonicalName']
     act = grano.findEntity(ACTOR['name'], title=title) or {}

@@ -40,7 +40,7 @@ def update_reference(engine, data, table_name, col):
                 if not len(ref['euname']):
                     ref['euname'] = row[col]
                 matched = True
-                sl.upsert(engine, table, {
+                sl.update_row(engine, table, {
                         col: country,
                         col + 'Code': ref['iso2']},
                         [col])

@@ -58,6 +58,8 @@ def load_rep(rep, engine):
                                        rep['lastUpdateDate'].isoformat())
     childBase = {'representativeEtlId': etlId,
                  'representativeUpdateDate': rep['lastUpdateDate']}
+    if not rep['originalName']:
+        print rep
     load_person(rep.pop('legalPerson'), 'legal', childBase, engine)
     load_person(rep.pop('headPerson'), 'head', childBase, engine)
     for actionField in rep.pop('actionFields'):
