@@ -171,6 +171,7 @@ def load(engine, grano):
         rep_ent['members'] = int(float(rep['members']))
         rep_ent['incoming'] = rep_ent.get('incoming', [])
         rep_ent['outgoing'] = rep_ent.get('outgoing', [])
+        rep_ent['contactCountry'] = rep_ent['contactCountryNorm']
         rep_ent = load_clients(grano, engine, rep_ent)
         rep_ent = load_organisations(grano, engine, rep_ent)
         rep_ent = load_persons(grano, engine, rep_ent)

@@ -41,7 +41,8 @@ def update_reference(engine, data, table_name, col):
                     ref['euname'] = row[col]
                 matched = True
                 sl.update_row(engine, table, {
-                        col: country,
+                        col: row[col],
+                        col + 'Norm': country,
                         col + 'Code': ref['iso2']},
                         [col])
         if not matched:
