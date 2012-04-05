@@ -94,6 +94,13 @@ Handlebars.registerHelper('longtext', function(text) {
   return new Handlebars.SafeString(snippet);
 });
 
+$('html').on('click', '.longtext .abstract a', function(e) {
+  var elem = $(e.target).parents('.longtext');
+  elem.find('.abstract').hide();
+  elem.find('.full').slideDown();
+  return false;
+});
+
 Handlebars.registerHelper('preformatted', function(text) {
   return new Handlebars.SafeString(text.replace(/\n/g, '<br/>\n'));
 });
