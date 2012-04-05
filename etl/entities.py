@@ -1,10 +1,9 @@
 import logging
-import csv, os
+import csv
+import os
 
-from recon import company
 import sqlaload as sl
 
-from common import integrate_recon
 from normalize import normalize_text, reverse_normalize
 
 import SETTINGS
