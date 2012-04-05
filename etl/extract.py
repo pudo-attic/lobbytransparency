@@ -90,6 +90,7 @@ def load_rep(rep, engine):
     load_finances(rep.pop('fd'), childBase, engine)
     #pprint(rep)
     rep['etlFingerPrint'] = rep['originalName'].strip()
+    rep['network_extracted'] = False
     sl.upsert(engine, sl.get_table(engine, 'representative'), rep,
               ['etlId'])
 
