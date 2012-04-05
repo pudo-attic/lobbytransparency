@@ -6,6 +6,12 @@ generate a collection of scripts that need to be run in a particular
 environment, order and configuration. I'll try to keep track of this as
 cleanly as possible, but otherwise ask: friedrich@pudo.org
 
+It is important to realize that the LobbyTransparency site depends on 
+another piece of software, ``grano``, to provide backend storage for 
+the resulting lobby graph. For more information on grano, check out:
+
+  http://github.com/pudo/grano
+
 
 Creating the virtualenv
 -----------------------
@@ -24,6 +30,7 @@ the working directory of this project) is simple::
   $ git clone https://github.com/okfn/lobbytransparency
   $ cd lobbytransparency
   $ virtualenv pyenv
+
   # Repeat this step whenever you want to enter the environment in a 
   # fresh terminal:
   $ source pyenv/bin/activate
@@ -41,6 +48,15 @@ therefore is to download this archive::
 
   $ cd etl
   $ ./fetch_archive.sh
+
+Alternatively, there is a simple script to execute the whole ETL process
+with remote data::
+
+  $ cd etl
+  $ sh update.sh
+
+This requires that you adapt the settings in ``SETTINGS.py`` to match your
+local environment (ETL postgres database URI, grano instance).
 
 
 
