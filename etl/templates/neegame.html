@@ -1,0 +1,80 @@
+
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>NEE Game</title>
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="http://lobbydemo.pudo.org/css/bootstrap.css">
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
+  
+  <script src="http://sna.pudo.org/static/js/lib/jquery.min.js"></script>
+  <script src="http://sna.pudo.org/static/js/lib/bootstrap.min.js"></script>
+  <script src="http://sna.pudo.org/static/js/lib/underscore.min.js"></script>
+  <script src="http://sna.pudo.org/static/js/lib/backbone.min.js"></script>
+  <script src="http://sna.pudo.org/static/js/lib/handlebars.js"></script>
+  <script src="http://sna.pudo.org/static/js/app.js"></script>
+
+</head>
+<body>
+  <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
+  
+  <div class="container">
+    <br/>
+    <h1 id='title'>&nbsp;</h1>
+    <br/>
+    <div class="alert alert-info">Highlight all the entities (organisations, asssociations, networks etc.) mentioned in the text snippet below.</div>
+    <div class="well">
+        <pre id='text'></pre>
+    </div>
+    <ul id="matches">
+    </ul>
+    <button class="btn btn-large btn-success" id="save">Save these connections</button>
+    <button class="btn btn-large" id="reset">Undo &amp; reset</button>
+  </div>
+
+  <script>
+    $(function() {
+        var getRep = function() {
+            var matches = [];
+            $.get('/get').then(function(data) {
+                $('#matches').empty();
+                $('#title').text(data.originalName);
+                $('#text').text(data.networking||'');
+                $('#text').unbind('mouseup');
+                $('#text').mouseup(function(e) {
+                    var sel = window.getSelection();
+                    var match = sel.toString();
+                    if (match.length<2) return;
+                    matches.push(match);
+                    $('#matches').append('<li>' + match + '</li>');
+                });
+                $('#save').unbind('click');
+                $('#save').click(function(e) {
+                    $.post('/save', {'matches': matches, 'identificationCode': data.identificationCode}).then(function(e) {
+                        getRep();
+                    });
+                })
+            });
+        }
+        $('#reset').click(getRep);
+        getRep();
+    });
+  </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
