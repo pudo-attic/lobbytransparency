@@ -20,18 +20,26 @@ title: Loading...
     <div class='row'>
         <div class='span4'>
             <dl>
-                
-                    <dt>&nbsp;</dt>
+                {{#webSiteURL}}
+                    <dt>Link</dt>
                     <dd>
-                    {{#webSiteURL}}
                         <a href="{{this}}">
                             {{../acronym}}
                             {{^../acronym}}
                                 {{../title}}
                             {{/../acronym}}
                         </a>
-                    {{/webSiteURL}}
+                    
                     </dd>
+                {{/webSiteURL}}
+                {{^webSiteURL}}
+                    {{#acronym}}
+                        <dt>Alias</dt>
+                        <dd>
+                            {{this}}
+                        </dd>
+                    {{/acronym}}
+                {{/webSiteURL}}
                 {{#subCategory}}
                     <dt>Category</dt>
                     <dd>
@@ -55,13 +63,12 @@ title: Loading...
                     <dt>Staff lobbyists</dt>
                     <dd>{{this}}</dd>
                 {{/members}}
-                {{#contactPhone}}
-                    <dt>Phone</dt>
-                    <dd>(+{{../contactIndicPhone}}) {{this}}</a></dd>
-                {{/contactPhone}}
+                
                 {{#contactCountry}}
-                    <dt>Address</dt>
-                    <dd><address>
+                    <dt>Contact</dt>
+                    <dd>
+                        Tel. (+{{../contactIndicPhone}}) {{../contactPhone}}<br/>
+                        <address>
                         {{../contactStreet}} {{../contactNumber}}<br/>
                         {{../contactPostCode}} {{../contactTown}}<br/>
                         {{this}}
@@ -174,14 +181,15 @@ title: Loading...
             </table>
             {{/if}}
 
-            {{#if memberships}}
-            <h3>Memberships</h3>
+            {{#if associations}}
+            <h3>Associations</h3>
             <table class="table table-striped table-condensed">
-                {{#memberships}}
+                {{#associations}}
                     <tr>
                         <td><a href="{{url}}">{{title}}</a></td>
+                        <td>{{reltype}}</a></td>
                     </tr>
-                {{/memberships}}
+                {{/associations}}
             </table>
             {{/if}}
 
@@ -248,10 +256,6 @@ title: Loading...
                 <h3>Goals</h3>
                 <p>{{longtext this}}</p>
             {{/goals}}
-            {{#networking}}
-                <h3>Networking</h3>
-                <p>{{longtext this}}</p>
-            {{/networking}}
         </div>
     </div>
 </script>
@@ -309,7 +313,7 @@ title: Loading...
                     function(e) { 
                         e.source.url = LobbyTransparency.entityUrl(e.source.id);
                         return e.source; 
-                    }));
+                    }), false, function(e) {return e.id;});
 
                 data.firms = _.map(_.filter(data.outgoing, 
                     function(e) { return e.type=='turnover'; }),
@@ -327,19 +331,40 @@ title: Loading...
                         return e.source; 
                     });
 
-                data.memberorgs = _.map(_.filter(data.outgoing, 
+                var memberorgs = _.map(_.filter(data.outgoing, 
                     function(e) { return e.type=='member'; }),
                     function(e) { 
                         e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        e.target.reltype = 'member';
                         return e.target; 
                     });
 
-                data.memberships = _.map(_.filter(data.incoming, 
+                var memberships = _.map(_.filter(data.incoming, 
                     function(e) { return e.type=='member'; }),
                     function(e) { 
                         e.source.url = LobbyTransparency.entityUrl(e.source.id);
+                        e.source.reltype = 'organized in';
                         return e.source; 
                     });
+
+                var associations_in = _.map(_.filter(data.incoming, 
+                    function(e) { return e.type=='associated'; }),
+                    function(e) { 
+                        e.source.url = LobbyTransparency.entityUrl(e.source.id);
+                        e.source.reltype = 'associated';
+                        return e.source; 
+                    });
+
+                var associations_out = _.map(_.filter(data.outgoing, 
+                    function(e) { return e.type=='associated'; }),
+                    function(e) { 
+                        e.target.url = LobbyTransparency.entityUrl(e.target.id);
+                        e.target.reltype = 'associated';
+                        return e.target; 
+                    });
+
+                data.associations = _.sortBy(_.uniq(_.union(memberorgs, memberships, associations_in, associations_out),
+                    false, function(e) { return e.id; }), function(e) { return e.title; });
 
                 data.fdCost = LobbyTransparency.numRange(data.fdCostMin, data.fdCostMax, data.fdCostAbsolute);
                 data.fdDirectRepCosts = LobbyTransparency.numRange(data.fdDirectRepCostsMin, data.fdDirectRepCostsMax);
