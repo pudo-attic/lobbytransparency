@@ -30,6 +30,7 @@ def create_network(grano):
                           ('entity', INTEREST),
                           ('relation', TURNOVER),
                           ('relation', MEMBERSHIP),
+                          ('relation', ASSOCIATED),
                           ('relation', TOPIC),
                           ('relation', EMPLOYMENT)):
         if grano.getSchema(type_, schema['name']):

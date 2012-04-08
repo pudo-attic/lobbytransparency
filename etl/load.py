@@ -108,6 +108,20 @@ def load_organisations(grano, engine, rep):
     return rep
 
 
+def load_networking(grano, engine, rep):
+    for org in sl.find(engine, sl.get_table(engine, 'network_entity'),
+        identificationCode=rep['identificationCode']):
+        ent = canonical_actor(grano, engine, org['etlFingerPrint'])
+
+        rel = find_relation(rep['outgoing'], 'target', ent,
+            {'type': ASSOCIATED['name']})
+        rel['type'] = ASSOCIATED['name']
+        rel['source'] = rep.get('id')
+        rel['target'] = ent
+        rep['outgoing'] = replace_relation(rep['outgoing'], 'target', rel)
+    return rep
+
+
 def load_clients(grano, engine, rep):
     for fdto in sl.find(engine, sl.get_table(engine, 'financialDataTurnover'),
         representativeEtlId=rep['etlId']):
@@ -174,6 +188,7 @@ def load(engine, grano):
         rep_ent['contactCountry'] = rep_ent['contactCountryNorm']
         rep_ent = load_clients(grano, engine, rep_ent)
         rep_ent = load_organisations(grano, engine, rep_ent)
+        rep_ent = load_networking(grano, engine, rep_ent)
         rep_ent = load_persons(grano, engine, rep_ent)
         rep_ent = load_interests(grano, engine, rep_ent)
         rep_ent = load_action_fields(grano, engine, rep_ent)

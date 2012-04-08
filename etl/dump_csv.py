@@ -7,10 +7,13 @@ company_types = """SELECT "legalStatus", "contactCountry", COUNT(*) AS numHits F
                    "legalStatus", "contactCountry" ORDER BY "legalStatus" ASC;"""
 entities = """SELECT * FROM entity;"""
 
+network_entities = """SELECT * FROM network_entity;"""
+
 def dump_query(engine, q, file_name):
     fh = open(file_name, 'wb')
     rp = engine.execute(q)
     sl.dump_csv(sl.resultiter(rp), fh)
+
 
 if __name__ == '__main__':
     import sys
@@ -18,4 +21,3 @@ if __name__ == '__main__':
     engine = sl.connect(sys.argv[1])
     #dump_query(engine, company_types, "legalStatus.csv")
     dump_query(engine, entities, "entity.csv")
-

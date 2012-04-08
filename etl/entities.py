@@ -34,6 +34,7 @@ def update_entities(engine, file_name):
             continue
         if not row.get('canonicalName'):
             row['canonicalName'] = row['etlFingerPrint']
+        row['canonicalName'] = cleanCanonical(row['canonicalName'])
         entity = data.get(fp)
         if entity and entity.get('canonicalName') and \
             fp != entity.get('canonicalName'):
@@ -53,11 +54,22 @@ def update_entities(engine, file_name):
     fh.close()
 
 
+def cleanCanonical(name):
+    name = name.strip()
+    name = name.replace('\t', ' ')
+    name = name.replace('\n', ' ')
+    name = name.replace('\r', ' ')
+    name = name.replace('  ', ' ')
+    name = name.replace('  ', ' ')
+    name = name.replace('  ', ' ')
+    return name
+
+
 def create_entities(engine):
     log.info("De-normalizing global entities collection...")
     table = sl.get_table(engine, 'entity')
     for tbl in ['representative', 'person', 'financialDataTurnover',
-        'organisation']:
+        'organisation', 'network_entity']:
         for row in sl.all(engine, sl.get_table(engine, tbl)):
             entity = {'etlFingerPrint': row.get('etlFingerPrint')}
             entity['legalStatus'] = row.get('legalStatus', '')

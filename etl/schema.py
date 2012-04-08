@@ -45,6 +45,12 @@ MEMBERSHIP = {
     'attributes': {}
     }
 
+ASSOCIATED = {
+    'label': 'Associated',
+    'name': 'associated',
+    'attributes': {}
+    }
+
 TOPIC = {
     'label': 'Topic',
     'name': 'topic',
