@@ -8,6 +8,7 @@ from entities import create_entities, update_entities
 from load import load
 from setup import setup, make_grano
 from transform import transform
+from network_entities import update_network_entities
 
 
 if __name__ == '__main__':
@@ -19,6 +20,7 @@ if __name__ == '__main__':
     engine = sl.connect(SETTINGS.ETL_URL)
     extract(engine, ir_source_file, ap_source_file)
     create_entities(engine)
+    update_network_entities(engine, 'network_entities.csv')
     update_entities(engine, 'entities.csv')
     transform(engine)
     grano = make_grano()

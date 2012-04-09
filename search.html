@@ -1,0 +1,18 @@
+---
+layout: default
+title: Search
+---
+
+<h2 class="page-header">
+    Search
+</h2>
+
+<input class='span12 input-xlarge' id='query'>
+
+{% include datatable.html %}
+
+<script>
+    $(function() {
+    window.table = LobbyTransparency.searchTable($('#table'), $('#query'), {});
+  });
+</script>

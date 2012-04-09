@@ -4,6 +4,14 @@ var LobbyTransparency = LobbyTransparency || {};
 
 var cur = LobbyTransparency;
 
+cur.delay = (function(){
+  var timer = 0;
+  return function(callback, ms){
+    clearTimeout (timer);
+    timer = setTimeout(callback, ms);
+  };
+})();
+
 cur.parseQuery = function(str) {
     var parsed = {};
     var pairs = str.split('&');
@@ -63,6 +71,44 @@ cur.makeTable = function(elem, queryName, columns, options) {
         "sPaginationType": "bootstrap"
       }
     );
+};
+
+cur.searchTable = function(elem, querybox, options) {
+    var query = cur.parseQuery(window.location.search.substring(1));
+    querybox.val(query.q||'');
+    elem.find('thead tr').remove();
+    var datatable = new Grano.DataTable(elem,
+      {
+        makeUrl: function(options) {
+          return LobbyTransparency.apiUrl + options.dataset + '/entities';
+        },
+        extendParams: function(params, options) {
+          params.q = querybox.val();
+          params.type = 'actor';
+          return params;
+        },
+        columnDefs: [{
+          aTargets: [0],
+          mDataProp: 'title',
+          fnRender: LobbyTransparency.renderEntity()
+        }],
+        params: _.extend({
+            limit: 20,
+            offset: 0
+        }, options)
+      },
+      {
+        bFilter: true,
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap"
+      }
+    );
+    querybox.keyup(function(e) {
+      cur.delay(function(){
+        datatable.element.fnDraw(true);
+      }, 400);
+    });
+    return datatable;
 };
 
 cur.numRange = function(min, max, abs) {

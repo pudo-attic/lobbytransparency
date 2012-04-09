@@ -14,6 +14,13 @@
       source: 'http://localhost:5000/api/1',
       dataset: 'eutr',
       query: 'test',
+      makeUrl: function(options) {
+        var apiUrl = options.source + options.dataset + '/queries/';
+        return apiUrl + options.query + '/run';
+      },
+      extendParams: function(params, options) {
+        return params;
+      },
       params: {
         limit: 20,
         offset: 0
@@ -55,9 +62,10 @@
       newparams.offset = p.iDisplayStart;
       newparams.limit = p.iDisplayLength;
       //newparams.q = p.sSearch;
-      var apiUrl = this.options.source + this.options.dataset + '/queries/';
-      apiUrl = apiUrl + this.options.query + '/run';
-      var rq = $.get(apiUrl, newparams, function(d) {}, 'jsonp');
+      var rq = $.get(
+        this.options.makeUrl(this.options),
+        this.options.extendParams(newparams, this.options), 
+        function(d) {}, 'jsonp');
       rq.fail(ajaxError("Source request failed. Params: " + (JSON.stringify(p))));
       rq.then(function(data) {
         $(conf.oInstance).trigger('xhr', conf);
