@@ -10,6 +10,8 @@ log = logging.getLogger('load')
 
 PROPS = {}
 
+DELETED = set()
+
 
 def canonical_actor(grano, engine, title):
     entity_table = sl.get_table(engine, 'entity')
@@ -18,14 +20,16 @@ def canonical_actor(grano, engine, title):
         'canonicalName' in res and \
         res['canonicalName'] and \
         title != res['canonicalName']:
-        nonCanon = grano.findEntity(ACTOR['name'], title=title)
-        if nonCanon:
-            ent = grano.getEntity(nonCanon['id'], deep=True)
-            for rel in ent.get('incoming', []):
-                grano.deleteRelation(rel)
-            for rel in ent.get('outgoing', []):
-                grano.deleteRelation(rel)
-            grano.deleteEntity(nonCanon)
+        if title not in DELETED:
+            nonCanon = grano.findEntity(ACTOR['name'], title=title)
+            if nonCanon:
+                ent = grano.getEntity(nonCanon['id'], deep=True)
+                for rel in ent.get('incoming', []):
+                    grano.deleteRelation(rel)
+                for rel in ent.get('outgoing', []):
+                    grano.deleteRelation(rel)
+                grano.deleteEntity(nonCanon)
+                DELETED.add(title)
         title = res['canonicalName']
     act = grano.findEntity(ACTOR['name'], title=title) or {}
     print [title]
