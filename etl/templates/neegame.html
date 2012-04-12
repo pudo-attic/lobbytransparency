@@ -57,7 +57,7 @@
                 });
                 $('#save').unbind('click');
                 $('#save').click(function(e) {
-                    $.post('/save', {'matches': matches, 'identificationCode': data.identificationCode}).then(function(e) {
+                    $.post('/save', {'matches': matches, 'representativeEtlId': data.etlId}).then(function(e) {
                         getRep();
                     });
                 })

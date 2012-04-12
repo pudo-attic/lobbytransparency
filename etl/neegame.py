@@ -59,15 +59,15 @@ def reset():
 
 @app.route('/save', methods=['POST'])
 def save():
-    orgId = request.form.get('identificationCode')
+    etlId = request.form.get('representativeEtlId')
     matches = set(request.form.getlist('matches[]'))
     for match in matches:
         match = match.strip().strip(",").strip(";").strip(".").strip()
         sl.upsert(engine, network_entity, {'etlFingerPrint': match,
-                                           'identificationCode': orgId},
-                ['etlFingerPrint', 'identificationCode'])
-    sl.upsert(engine, representative, {'identificationCode': orgId,
-        'network_extracted': True}, ['identificationCode'])
+                                           'representativeEtlId': etlId},
+                ['etlFingerPrint', 'representativeEtlId'])
+    sl.upsert(engine, representative, {'etlId': etlId,
+        'network_extracted': True}, ['etlId'])
     return jsonify({'status': 'OK'})
 
 if __name__ == '__main__':

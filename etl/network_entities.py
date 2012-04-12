@@ -15,29 +15,29 @@ def update_network_entities(engine, file_name):
     log.info("Updating network entities reference sheet: %s", file_name)
     network_entities = set()
     table = sl.get_table(engine, 'network_entity')
-    if os.path.exists(file_name):
+    if os.path.exists(file_name) and False:
         fh = open(file_name, 'rb')
         reader = csv.DictReader(fh)
         for d in reader:
             e = [(k, v.decode('utf-8')) for (k, v) in d.items()]
             e = dict(e)
-            network_entities.add((e['identificationCode'], e['etlFingerPrint']))
-            sl.upsert(engine, table, e, ['identificationCode', 'etlFingerPrint'])
+            network_entities.add((e['representativeEtlId'], e['etlFingerPrint']))
+            sl.upsert(engine, table, e, ['representativeEtlId', 'etlFingerPrint'])
         fh.close()
         reps = set([ne[0] for ne in network_entities])
         rep_table = sl.get_table(engine, 'representative')
         for rep in reps:
-            sl.update(engine, rep_table, {'identificationCode': rep}, {'network_extracted': True})
+            sl.update(engine, rep_table, {'etlId': rep}, {'network_extracted': True})
 
     for row in sl.all(engine, table):
-        network_entities.add((row['identificationCode'], row['etlFingerPrint']))
+        network_entities.add((row['representativeEtlId'], row['etlFingerPrint']))
 
     fh = open(file_name, 'wb')
     writer = None
     table = sl.get_table(engine, 'network_entity')
     for ic, fp in network_entities:
         row = {
-            'identificationCode': ic,
+            'representativeEtlId': ic,
             'etlFingerPrint': fp
         }
         if writer is None:
