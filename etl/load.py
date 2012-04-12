@@ -32,11 +32,15 @@ def canonical_actor(grano, engine, title):
                 DELETED.add(title)
         title = res['canonicalName']
     act = grano.findEntity(ACTOR['name'], title=title) or {}
-    print [title]
+    print [title], act.get('id')
     act['title'] = title
     act['type'] = ACTOR['name']
     return act
 
+def ensure_actor(grano, act):
+    if 'id' not in act:
+        return grano.createEntity(act)
+    return act
 
 def replace_relation(lst, attribute, rel, match=['type']):
     new_list = [rel]
@@ -85,6 +89,7 @@ def load_persons(grano, engine, rep):
         psn['accreditationEndDate'] = person.get('accreditationEndDate')
         psn['accreditationStartDate'] = person.get('accreditationStartDate')
         psn['actsAsPerson'] = True
+        psn = ensure_actor(grano, psn)
 
         rel = find_relation(rep['outgoing'], 'target', psn,
             {'type': EMPLOYMENT['name'], 'role': person['role']})
@@ -103,6 +108,8 @@ def load_organisations(grano, engine, rep):
         ent['members'] = int(float(org['numberOfMembers'] or 0))
         ent['actsAsOrganisation'] = True
 
+        ent = ensure_actor(grano, ent)
+
         rel = find_relation(rep['outgoing'], 'target', ent,
             {'type': MEMBERSHIP['name']})
         rel['type'] = MEMBERSHIP['name']
@@ -114,8 +121,9 @@ def load_organisations(grano, engine, rep):
 
 def load_networking(grano, engine, rep):
     for org in sl.find(engine, sl.get_table(engine, 'network_entity'),
-        identificationCode=rep['identificationCode']):
+        representativeEtlId=rep['etlId']):
         ent = canonical_actor(grano, engine, org['etlFingerPrint'])
+        ent = ensure_actor(grano, ent)
 
         rel = find_relation(rep['outgoing'], 'target', ent,
             {'type': ASSOCIATED['name']})
@@ -133,6 +141,7 @@ def load_clients(grano, engine, rep):
         client = canonical_actor(grano, engine, fdto['name'])
         client.update(fdto)
         client['actsAsClient'] = True
+        client = ensure_actor(grano, client)
 
         rel = find_relation(rep['incoming'], 'source', client,
             {'type': TURNOVER['name']})

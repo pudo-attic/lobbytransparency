@@ -38,11 +38,11 @@ class GranoClient(object):
         url = self._make_url(collection, network=network,
             member=member, subcollection=subcollection,
             submember=submember, ignore_network=ignore_network)
-        print method, url
         data = json.dumps(data, cls=GranoJSONEncoder) if data else None
         response = self.session.request(method, url,
             params=params, data=data)
         if not response.ok:
+            print method, url
             print response.status_code, response.text
         return (response, lambda: json.loads(response.text))
 

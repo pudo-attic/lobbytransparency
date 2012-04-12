@@ -15,7 +15,7 @@ def update_network_entities(engine, file_name):
     log.info("Updating network entities reference sheet: %s", file_name)
     network_entities = set()
     table = sl.get_table(engine, 'network_entity')
-    if os.path.exists(file_name) and False:
+    if os.path.exists(file_name):
         fh = open(file_name, 'rb')
         reader = csv.DictReader(fh)
         for d in reader:

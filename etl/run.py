@@ -19,8 +19,8 @@ if __name__ == '__main__':
     ap_source_file = sys.argv[2]
     engine = sl.connect(SETTINGS.ETL_URL)
     extract(engine, ir_source_file, ap_source_file)
-    create_entities(engine)
     update_network_entities(engine, 'network_entities.csv')
+    create_entities(engine)
     update_entities(engine, 'entities.csv')
     transform(engine)
     grano = make_grano()
