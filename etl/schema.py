@@ -219,9 +219,14 @@ ACTOR = {
             'label': 'Category (ID)',
             'help': ''
             },
-        'members': {
+        'staffMembers': {
             'type': 'integer',
-            'label': '# Members',
+            'label': 'Staff Members',
+            'help': ''
+            },
+        'orgMembers': {
+            'type': 'integer',
+            'label': 'Organisation Members',
             'help': ''
             },
         'networking': {

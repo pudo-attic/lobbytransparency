@@ -7,7 +7,7 @@ title: Loading...
 
 <script id="spinner" type="text/x-handlebars-template">
     <div class='row'>
-        <div class='span12' style='margin-top: 4em;'>
+        <div class='span12' style='margin-top: 4em; margin-bottom: 4em;'>
             <center><img src='/img/spinner.gif'></center>
         </div>
     </div>
@@ -15,7 +15,7 @@ title: Loading...
 
 {% raw %}
 <script id="actor" type="text/x-handlebars-template">
-    <h2>{{title}} 
+    <h2 class="page-header">{{title}} 
         <small>
             {{#actsAsPerson}}<span class='label'>Person</span>{{/actsAsPerson}}
             {{#actsAsRepresentative}}<span class='label'>Registrant</span>{{/actsAsRepresentative}}
@@ -79,11 +79,14 @@ title: Loading...
                         <a href='{{this.url}}' class='hoverpop' title='{{this.position}}'>{{this.title}}</a>
                     </dd>
                 {{/legal}}
-                {{#members}}
+                {{#staffMembers}}
                     <dt>Staff lobbyists</dt>
                     <dd>{{this}}</dd>
-                {{/members}}
-                
+                {{/staffMembers}}
+                {{#orgMembers}}
+                    <dt>Members</dt>
+                    <dd>{{this}}</dd>
+                {{/orgMembers}}
                 {{#contactCountry}}
                     <dt>Contact</dt>
                     <dd>
@@ -107,6 +110,10 @@ title: Loading...
                     </ul></dd>
                 {{/if}}
                 -->
+                {{#identificationCode}}
+
+                <a href="http://ec.europa.eu/transparencyregister/public/consultation/displaylobbyist.do?id={{this}}">Source</a>
+                {{/identificationCode}}
             </dl>
         </div>
         <div class='span8 tab-content'>

@@ -105,7 +105,7 @@ def load_organisations(grano, engine, rep):
     for org in sl.find(engine, sl.get_table(engine, 'organisation'),
         representativeEtlId=rep['etlId']):
         ent = canonical_actor(grano, engine, org['name'])
-        ent['members'] = int(float(org['numberOfMembers'] or 0))
+        ent['orgMembers'] = int(float(org['numberOfMembers'] or 0))
         ent['actsAsOrganisation'] = True
 
         ent = ensure_actor(grano, ent)
@@ -195,7 +195,7 @@ def load(engine, grano):
         #    continue
         rep_ent.update(rep)
         rep_ent['actsAsRepresentative'] = True
-        rep_ent['members'] = int(float(rep['members']))
+        rep_ent['staffMembers'] = int(float(rep['members']))
         rep_ent['incoming'] = rep_ent.get('incoming', [])
         rep_ent['outgoing'] = rep_ent.get('outgoing', [])
         rep_ent['contactCountry'] = rep_ent['contactCountryNorm']

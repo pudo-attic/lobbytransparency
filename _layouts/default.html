@@ -16,7 +16,6 @@
   <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon" />
   
   <script src="http://sna.pudo.org/static/js/lib/jquery.min.js"></script>
-  <script src="http://sna.pudo.org/static/js/lib/bootstrap.min.js"></script>
   <script src="http://sna.pudo.org/static/js/lib/underscore.min.js"></script>
   <script src="http://sna.pudo.org/static/js/lib/backbone.min.js"></script>
   <script src="http://sna.pudo.org/static/js/lib/handlebars.js"></script>
@@ -27,6 +26,7 @@
   <script src="/js/lib/jquery.dataTables.min.js"></script>
   <script src="/js/lib/dataTables.bootstrap.js"></script>
   <script src="/js/lib/jquery.format.min.js"></script>
+  <script src="/js/bootstrap.js"></script>
   <script src="/js/util.js"></script>
   <script src="/js/table.js"></script>
   <script>
@@ -36,17 +36,70 @@
 </head>
 <body>
   <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
-  <header>
-    <div class="container">
-      <h1>LobbyTransparency.eu / LobbyingExposed Demo Ground.</h1>
-      <div class="pull-right">
-        <br/>
-        <form action="/search.html">
-          <input name="q" placeholder="Find lobbyists...">
-        </form>
+
+
+  <div class="navbar">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="/">
+          <img src="/img/logo.png">
+          Lobby Europe
+        </a>
+        <div class="nav-collapse">
+          <ul class="nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Money
+                <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/reports/companies_by_exp.html">Companies spending the most</a></li>
+                <li><a href="/reports/tradeassoc_by_exp.html">Trade associations spending the most</a></li>
+                <li><a href="/reports/consultancies_by_turnover.html">Consultancies with the largest turnover</a></li>
+                <li><a href="/reports/lawfirms_by_turnover.html">Law firms with the largest turnover</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Lobbyists
+                <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/reports/companies_by_fte.html">Companies with the largest staff</a></li>
+                <li><a href="/reports/ngos_by_fte.html">NGOs with the largest staff</a></li>
+                <li><a href="/reports/tradeassoc_by_fte.html">Trade associations with the largest staff</a></li>
+                <li><a href="/reports/lawfirms_by_fte.html">Law firms with the largest staff</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Topics
+                <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="/reports/fte_by_category.html">Lobbyists by type of registrar</a></li>
+                <li><a href="/reports/rep_by_country.html">Registered interests per country</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <form class="navbar-search pull-right" action="/search.html">
+            <input type="text" class="search-query span2" name="q" placeholder="Search">
+          </form>
+          <ul class="nav pull-right">
+            <li><a href="/about.html">About</a></li>
+            <li><a href="/data.html">Data</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="">
-        <br/>
+    </div>
+  </div>
+
+  <div class="container" id="pagebody">
+    {{ content }}
+  </div>
+
+  <footer>
+    <div class="container">
+      <br/>
+      A joint project of Corporate Europe Observatory, 
+      LobbyControl, Friends of the Earth Europe and 
+      OKFN Labs. 
+      <br/>
         <a href="/">Home</a>
         &middot;
         <a href="http://ec.europa.eu/transparencyregister/public/consultation/search.do?locale=en#en">Official Register</a>
@@ -54,17 +107,6 @@
         <a href="https://github.com/pudo/lobbytransparency/issues">Report issues</a>
         &middot;
         <a href="https://github.com/pudo/lobbytransparency">Code repo</a>
-      </div>
-    </div>
-  </header>
-
-  <div class="container">
-    {{ content }}
-  </div>
-
-  <footer>
-    <div class="inner">
-      
     </div>
   </footer>
 
