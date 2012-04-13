@@ -5,9 +5,17 @@ title: Loading...
 
 <div id='entity'></div>
 
+<script id="spinner" type="text/x-handlebars-template">
+    <div class='row'>
+        <div class='span12' style='margin-top: 4em;'>
+            <center><img src='/img/spinner.gif'></center>
+        </div>
+    </div>
+</script>
+
 {% raw %}
 <script id="actor" type="text/x-handlebars-template">
-    <h2 class="page-header">{{title}} 
+    <h2>{{title}} 
         <small>
             {{#actsAsPerson}}<span class='label'>Person</span>{{/actsAsPerson}}
             {{#actsAsRepresentative}}<span class='label'>Registrant</span>{{/actsAsRepresentative}}
@@ -18,6 +26,21 @@ title: Loading...
     
 
     <div class='row'>
+        <div class='offset4 span8'>
+            <ul class="nav nav-tabs" id='tab-menu'>
+                <li class="active"><a id="intro-tab" href="#intro" data-toggle="tab">
+                    Intro</a></li>
+                <li><a id="financials-tab" href="#financials" data-toggle="tab">
+                    Financials</a></li>
+                <li><a id="associations-tab" href="#associations" data-toggle="tab">
+                    Associations <span class='count'></span></a></li>
+                <li><a id="representation-tab" href="#representation" data-toggle="tab">
+                    Representation</a></li>
+                <li><a id="accreditations-tab" href="#accreditations" data-toggle="tab">
+                    Accreditations <span class='count'></span></a></li>
+            </ul>
+        </div>
+
         <div class='span4'>
             <dl>
                 {{#webSiteURL}}
@@ -50,13 +73,13 @@ title: Loading...
                 {{#head}}
                     <dt>Head Representative</dt>
                     <dd>
-                        <a href='{{this.url}}' title='{{this.position}}'>{{this.title}}</a>
+                        <a href='{{this.url}}' class='hoverpop' title='{{this.position}}'>{{this.title}}</a>
                     </dd>
                 {{/head}}
                 {{#legal}}
                     <dt>Legal Representative</dt>
                     <dd>
-                        <a href='{{this.url}}' title='{{this.position}}'>{{this.title}}</a>
+                        <a href='{{this.url}}' class='hoverpop' title='{{this.position}}'>{{this.title}}</a>
                     </dd>
                 {{/legal}}
                 {{#members}}
@@ -73,7 +96,7 @@ title: Loading...
                         {{../contactPostCode}} {{../contactTown}}<br/>
                         {{this}}
                         {{#../contactMore}}
-                            <p class='help-block'>{{longtext this}}</p>
+                            <p class='help-block'>{{{longtext this}}}</p>
                         {{/../contactMore}}
                     </address></dd>
                 {{/contactCountry}}
@@ -88,174 +111,173 @@ title: Loading...
                 
             </dl>
         </div>
-        <div class='span8'>
-            {{#activities}}
-                <p>{{longtext this}}</p>
-            {{/activities}}
+        <div class='span8 tab-content'>
+            <div class="tab-pane active" id="intro">
+                {{#activities}}
+                    <p>{{{preformatted this}}}</p>
+                {{/activities}}
+                
+                {{#if employers}}
+                <h3>Employers</h3>
+                <table class="table table-striped table-condensed">
+                    {{#employers}}
+                        <tr>
+                            <td><a href="{{url}}">{{title}}</a></td>
+                        </tr>
+                    {{/employers}}
+                </table>
+                {{/if}}            
 
-            {{#if fdType}}
-            <h3>Financial Statement
-                <small>Period of {{dateformat fdStartDate}} -
-                   {{dateformat fdEndDate}}</small>
-            </h3>
-            <table class="table table-striped table-condensed">
-                <tr>
-                    <th colspan="2">Expenditure</th>
-                    <th width="30%"></th>
-                </tr>
-                <tr>
-                    <td colspan="2">Cost</td>
-                    <td>{{fdCost}}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Direct Representation Cost</td>
-                    <td>{{fdDirectRepCosts}}</td>
-                </tr>
-                <tr>
-                    <th colspan="2">Revenue</th>
-                    <th></th>
-                </tr>
-                <tr>
-                    <td colspan="2">Client Turnover</td>
-                    <td>{{fdTurnover}}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">European Sources</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Grants</td>
-                    <td>{{amount fdEurSourcesGrants}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Procurement</td>
-                    <td>{{amount fdEurSourcesProcurement}}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Publicly Financed</td>
-                    <td>{{amount fdPublicFinancingTotal}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>National</td>
-                    <td>{{amount fdPublicFinancingNational}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Infranational</td>
-                    <td>{{amount fdPublicFinancingInfranational}}</td>
-                </tr>
-                <!-- TODO: Other -->
-                <tr>
-                    <td colspan="2">Other Sources</td>
-                    <td>{{amount fdOtherSourcesTotal}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Donations</td>
-                    <td>{{amount fdOtherSourcesDonation}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>Contributions</td>
-                    <td>{{amount fdOtherSourcesContributions}}</td>
-                </tr>
-                <!-- TODO: Other -->
-                <tr>
-                    <td colspan="2">Total Budget</td>
-                    <td>{{amount fdTotalBudget}}</td>
-                </tr>
-            </table>
-            {{/if}}
+                {{#goals}}
+                    <h3>Goals</h3>
+                    <p>{{{longtext this}}}</p>
+                {{/goals}}
+            </div>
 
-            {{#if employers}}
-            <h3>Employers</h3>
-            <table class="table table-striped table-condensed">
-                {{#employers}}
+            <div class="tab-pane" id="financials">
+                {{#if fdType}}
+                <h3>Financial Statement
+                    <small>Period of {{dateformat fdStartDate}} -
+                       {{dateformat fdEndDate}}</small>
+                </h3>
+                <table class="table table-striped table-condensed">
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
+                        <th colspan="2">Expenditure</th>
+                        <th width="30%"></th>
                     </tr>
-                {{/employers}}
-            </table>
-            {{/if}}
-
-            {{#if associations}}
-            <h3>Associations</h3>
-            <table class="table table-striped table-condensed">
-                {{#associations}}
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
-                        <td>{{reltype}}</a></td>
+                        <td colspan="2">Cost</td>
+                        <td>{{fdCost}}</td>
                     </tr>
-                {{/associations}}
-            </table>
-            {{/if}}
-
-            {{#if memberorgs}}
-            <h3>Member Organisations</h3>
-            <table class="table table-striped table-condensed">
-                {{#memberorgs}}
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
+                        <td colspan="2">Direct Representation Cost</td>
+                        <td>{{fdDirectRepCosts}}</td>
                     </tr>
-                {{/memberorgs}}
-            </table>
-            {{/if}}
-
-            {{#if accreditations}}
-            <h3>European Parliament Accreditations</h3>
-            <table class="table table-striped table-condensed">
-                <tr>
-                    <th>Name</th>
-                    <th width="20%">Accreditation End</th>
-                </tr>
-                {{#accreditations}}
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
-                        <td width="20%">{{dateformat accreditationEndDate}}</td>
+                        <th colspan="2">Revenue</th>
+                        <th></th>
                     </tr>
-                {{/accreditations}}
-            </table>
-            {{/if}}
-
-            {{#if firms}}
-            <h3>Lobby consultancies hired</h3>
-            <table class="table table-striped table-condensed">
-                <tr>
-                    <th>Firm</th>
-                    <th width="30%">Expenditure</th>
-                </tr>
-                {{#firms}}
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
-                        <td>{{exp}}</td>
+                        <td colspan="2">Client Turnover</td>
+                        <td>{{fdTurnover}}</td>
                     </tr>
-                {{/firms}}
-            </table>
-            {{/if}}
-
-            {{#if clients}}
-            <h3>Clients</h3>
-            <table class="table table-striped table-condensed">
-                <tr>
-                    <th>Client</th>
-                    <th width="30%">Expenditure</th>
-                </tr>
-                {{#clients}}
                     <tr>
-                        <td><a href="{{url}}">{{title}}</a></td>
-                        <td>{{exp}}</td>
+                        <td colspan="2">European Sources</td>
+                        <td></td>
                     </tr>
-                {{/clients}}
-            </table>
-            {{/if}}
+                    <tr>
+                        <td></td>
+                        <td>Grants</td>
+                        <td>{{amount fdEurSourcesGrants}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Procurement</td>
+                        <td>{{amount fdEurSourcesProcurement}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Publicly Financed</td>
+                        <td>{{amount fdPublicFinancingTotal}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>National</td>
+                        <td>{{amount fdPublicFinancingNational}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Infranational</td>
+                        <td>{{amount fdPublicFinancingInfranational}}</td>
+                    </tr>
+                    <!-- TODO: Other -->
+                    <tr>
+                        <td colspan="2">Other Sources</td>
+                        <td>{{amount fdOtherSourcesTotal}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Donations</td>
+                        <td>{{amount fdOtherSourcesDonation}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>Contributions</td>
+                        <td>{{amount fdOtherSourcesContributions}}</td>
+                    </tr>
+                    <!-- TODO: Other -->
+                    <tr>
+                        <td colspan="2">Total Budget</td>
+                        <td>{{amount fdTotalBudget}}</td>
+                    </tr>
+                </table>
+                {{/if}}
+            </div>
 
-            {{#goals}}
-                <h3>Goals</h3>
-                <p>{{longtext this}}</p>
-            {{/goals}}
+            <div class="tab-pane" id="associations">
+                {{#if associations}}
+                <h3>Associations</h3>
+                <table class="table table-striped table-condensed">
+                    {{#associations}}
+                        <tr>
+                            <td><a href="{{url}}">{{title}}</a></td>
+                            <td>{{reltype}}</a></td>
+                        </tr>
+                    {{/associations}}
+                </table>
+                {{/if}}
+            </div>
+
+            <div class="tab-pane" id="accreditations">
+                {{#if accreditations}}
+                <h3>European Parliament Accreditations</h3>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>Name</th>
+                        <th width="20%">Accreditation End</th>
+                    </tr>
+                    {{#accreditations}}
+                        <tr>
+                            <td><a href="{{url}}">{{title}}</a></td>
+                            <td width="20%">{{dateformat accreditationEndDate}}</td>
+                        </tr>
+                    {{/accreditations}}
+                </table>
+                {{/if}}
+            </div>
+
+            <div class="tab-pane" id="representation">
+                {{#if firms}}
+                <h3>Lobby consultancies hired</h3>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>Firm</th>
+                        <th width="30%">Expenditure</th>
+                    </tr>
+                    {{#firms}}
+                        <tr>
+                            <td><a href="{{url}}">{{title}}</a></td>
+                            <td>{{exp}}</td>
+                        </tr>
+                    {{/firms}}
+                </table>
+                {{/if}}
+
+                {{#if clients}}
+                <h3>Clients</h3>
+                <table class="table table-striped table-condensed">
+                    <tr>
+                        <th>Client</th>
+                        <th width="30%">Expenditure</th>
+                    </tr>
+                    {{#clients}}
+                        <tr>
+                            <td><a href="{{url}}">{{title}}</a></td>
+                            <td>{{exp}}</td>
+                        </tr>
+                    {{/clients}}
+                </table>
+                {{/if}}
+            </div>
         </div>
     </div>
 </script>
@@ -276,6 +298,7 @@ title: Loading...
             if(!query.length) {
                 alert("No ID specified!");
             }
+            $('#entity').html($("#spinner").html());
             var params = LobbyTransparency.parseQuery(query);
             $.get(LobbyTransparency.apiUrl + 'eutr/entities/' + params.id + '/deep', function(data) {
                 $('title').html(data.title);
@@ -373,6 +396,30 @@ title: Loading...
 
                 console.log(data);
                 $('#entity').html(templates[data.type](data));
+                $('.hoverpop').tooltip({placement: 'right'});
+                //$('#tab-menu').tab();
+                if (!data.associations.length) {
+                    $('#associations-tab').hide();
+                }
+                if (data.associations.length) {
+                    $('#associations-tab .count').text('(' + data.associations.length + ')');
+                }
+                if (!data.firms.length&&!data.clients.length) {
+                    $('#representation-tab').hide();
+                }
+                if (!data.accreditations.length) {
+                    $('#accreditations-tab').hide();
+                }
+                if (data.accreditations.length) {
+                    $('#accreditations-tab .count').text('(' + data.accreditations.length + ')');
+                }
+                if (!data.fdType) {
+                    $('#financials-tab').hide();
+                }
+                if (!data.activities&&!data.employers.length) {
+                    $('#intro-tab').hide();
+                    $('#associations-tab').click();
+                }
             }, 'jsonp');
         };
 

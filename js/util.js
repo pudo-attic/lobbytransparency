@@ -142,7 +142,7 @@ Handlebars.registerHelper('longtext', function(text) {
   if (text.length < 160) {
     return text.replace(/\n/g, '<br/>\n');
   }
-  abstract = text.substring(0, 160);
+  abstract = text.substring(0, 160).replace('<br/>', ' ').replace('<br>', ' ');
   text = text.replace(/\n/g, '<br/>\n');
   snippet = "<span class='longtext'><span class='abstract'>" + abstract + "... ";
   snippet += "<a href='#'>More...</a></span>";
