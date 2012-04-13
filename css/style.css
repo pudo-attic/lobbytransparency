@@ -90,8 +90,8 @@ h2 span.label {
 }
 
 /* Tables */
-table.dataTable th,
-table.dataTable td {
+#pagebody table.dataTable th,
+#pagebody table.dataTable td {
     padding: 5px 13px;
 }
 
