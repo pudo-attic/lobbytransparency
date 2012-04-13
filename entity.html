@@ -35,7 +35,7 @@ title: Loading...
                 <li><a id="associations-tab" href="#associations" data-toggle="tab">
                     Associations <span class='count'></span></a></li>
                 <li><a id="representation-tab" href="#representation" data-toggle="tab">
-                    Representation</a></li>
+                    Representation <span class='count'></span></a></li>
                 <li><a id="accreditations-tab" href="#accreditations" data-toggle="tab">
                     Accreditations <span class='count'></span></a></li>
             </ul>
@@ -47,10 +47,7 @@ title: Loading...
                     <dt>Link</dt>
                     <dd>
                         <a href="{{this}}">
-                            {{../acronym}}
-                            {{^../acronym}}
-                                {{../title}}
-                            {{/../acronym}}
+                            {{../acronymOrTitle}}
                         </a>
                     
                     </dd>
@@ -100,6 +97,7 @@ title: Loading...
                         {{/../contactMore}}
                     </address></dd>
                 {{/contactCountry}}
+                <!--
                 {{#if interests}}
                     <dt>Interests</dt>
                     <dd><ul class="unstyled">
@@ -108,7 +106,7 @@ title: Loading...
                         {{/interests}}
                     </ul></dd>
                 {{/if}}
-                
+                -->
             </dl>
         </div>
         <div class='span8 tab-content'>
@@ -303,6 +301,7 @@ title: Loading...
             $.get(LobbyTransparency.apiUrl + 'eutr/entities/' + params.id + '/deep', function(data) {
                 $('title').html(data.title);
                 data.raw = JSON.stringify(data, null, '  ');
+                data.acronymOrTitle = data.acronym || data.title;
 
                 data.interests = _.map(_.filter(data.outgoing, 
                     function(e) { return e.target.type=='interest'; }),
@@ -400,17 +399,17 @@ title: Loading...
                 //$('#tab-menu').tab();
                 if (!data.associations.length) {
                     $('#associations-tab').hide();
-                }
-                if (data.associations.length) {
+                } else {
                     $('#associations-tab .count').text('(' + data.associations.length + ')');
                 }
                 if (!data.firms.length&&!data.clients.length) {
                     $('#representation-tab').hide();
+                } else {
+                    $('#representation-tab .count').text('(' + (data.firms.length+data.clients.length) + ')');
                 }
                 if (!data.accreditations.length) {
                     $('#accreditations-tab').hide();
-                }
-                if (data.accreditations.length) {
+                } else {
                     $('#accreditations-tab .count').text('(' + data.accreditations.length + ')');
                 }
                 if (!data.fdType) {
