@@ -3,16 +3,28 @@ layout: default
 title: Search
 ---
 
-<h2 class="page-header">
-    Search
-</h2>
-
 <input class='span12 input-xlarge' id='query'>
 
-{% include datatable.html %}
+<div class="row">
+
+    <div class="span10">
+        {% include datatable.html %}
+    </div>
+    <div class="span2" id='filters'>
+        <ul class="unstyled">
+            <li><input type="checkbox" class="filter" value="subCategoryId:21"> Companies</li>
+            <li><input type="checkbox" class="filter" value="subCategoryId:12"> Consultancies</li>
+            <li><input type="checkbox" class="filter" value="subCategoryId:11"> Legal Firms</li>
+            <li><input type="checkbox" class="filter" value="subCategoryId:24"> Trade Associations</li>
+            <li><input type="checkbox" class="filter" value="subCategoryId:31"> NGOs</li>
+            <li><input type="checkbox" class="filter" value="actsAsPerson:true"> Persons</li>
+        </ul>
+    </div>
+
+</div>
 
 <script>
     $(function() {
-    window.table = LobbyTransparency.searchTable($('#table'), $('#query'), {});
+    window.table = LobbyTransparency.searchTable($('#table'), $('#query'), $('#filters'), {});
   });
 </script>

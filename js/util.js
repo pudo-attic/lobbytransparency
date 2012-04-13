@@ -18,7 +18,7 @@ cur.parseQuery = function(str) {
     for (var i = 0, len = pairs.length, keyVal; i < len; ++i) {
         keyVal = pairs[i].split("=");
         if (keyVal[0]) {
-            parsed[keyVal[0]] = unescape(keyVal[1]);
+            parsed[keyVal[0]] = unescape(keyVal[1]).replace('+', ' ');
         }
     }
     return parsed;
@@ -73,19 +73,26 @@ cur.makeTable = function(elem, queryName, columns, options) {
     );
 };
 
-cur.searchTable = function(elem, querybox, options) {
+cur.searchTable = function(elem, querybox, filters, options) {
     var query = cur.parseQuery(window.location.search.substring(1));
     querybox.val(query.q||'');
-    elem.find('thead tr').remove();
+    elem.find('thead').hide();
     var datatable = new Grano.DataTable(elem,
       {
         makeUrl: function(options) {
           return LobbyTransparency.apiUrl + options.dataset + '/entities';
         },
         extendParams: function(params, options) {
+          params.filter = [];
+          filters.find('.filter').each(function(i, e) {
+            var el = $(e);
+            if (el.attr('checked')) {
+              params.filter.push(el.val());
+            }
+          });
           params.q = querybox.val();
           params.type = 'actor';
-          return params;
+          return $.param(params, true);
         },
         columnDefs: [{
           aTargets: [0],
@@ -99,7 +106,7 @@ cur.searchTable = function(elem, querybox, options) {
       },
       {
         bFilter: true,
-        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span4'i><'span6'p>>",
         "sPaginationType": "bootstrap"
       }
     );
@@ -107,6 +114,9 @@ cur.searchTable = function(elem, querybox, options) {
       cur.delay(function(){
         datatable.element.fnDraw(true);
       }, 400);
+    });
+    filters.change(function(e) {
+      datatable.element.fnDraw(true);
     });
     return datatable;
 };
