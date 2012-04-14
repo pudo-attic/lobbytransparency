@@ -51,10 +51,11 @@ cur.graphArea = function(el) {
 
 cur.loadGraph = function(id) {
   cur.sigInst.emptyGraph();
-  $.get(LobbyTransparency.apiUrl + 'eutr/entities/' + id + '/graph', 
-    {'entity_type': 'actor',
-     'wrap': 'json'},
-    function(data) {
+  $.ajax({
+    url: LobbyTransparency.apiUrl + 'eutr/entities/' + id + '/graph', 
+    data: {'entity_type': 'actor',
+           'wrap': 'json'},
+    success: function(data) {
       data = $.parseXML(data.xml);
       cur.sigInst.parseGexf(data);
       cur.sigInst.iterNodes(function(n){
@@ -75,8 +76,11 @@ cur.loadGraph = function(id) {
       cur.sigInst.activateFishEye();
       cur.sigInst.startForceAtlas2();
       cur.sigInst.draw();
-    }, 'jsonp');
-
+    }, 
+    dataType: 'jsonp',
+    cache: true,
+    jsonpCallback: 'loadGraph' + id.substring(0,6)
+    });
 };
 
 })(jQuery);

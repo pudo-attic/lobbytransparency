@@ -62,10 +62,12 @@
       newparams.offset = p.iDisplayStart;
       newparams.limit = p.iDisplayLength;
       //newparams.q = p.sSearch;
-      var rq = $.get(
-        this.options.makeUrl(this.options),
-        this.options.extendParams(newparams, this.options), 
-        function(d) {}, 'jsonp');
+      var rq = $.ajax({
+        url: this.options.makeUrl(this.options),
+        data: this.options.extendParams(newparams, this.options),
+        dataType: 'jsonp',
+        jsonpCallback: 'dataTableReload',
+        cache: true});
       rq.fail(ajaxError("Source request failed. Params: " + (JSON.stringify(p))));
       rq.then(function(data) {
         $(conf.oInstance).trigger('xhr', conf);
