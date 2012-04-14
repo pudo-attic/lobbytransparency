@@ -110,10 +110,6 @@ title: Loading...
                     </ul></dd>
                 {{/if}}
                 -->
-                {{#identificationCode}}
-
-                <a href="http://ec.europa.eu/transparencyregister/public/consultation/displaylobbyist.do?id={{this}}">Source</a>
-                {{/identificationCode}}
             </dl>
         </div>
         <div class='span8 tab-content'>
@@ -285,13 +281,34 @@ title: Loading...
             </div>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="span12"><h3>{{title}} Network (Experimental, loads forever)</h3></div>
+        <div class="span12 sigma-parent" id="sigma-example-parent">
+            <div class="sigma-expand" id="graph"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="span12">
+            {{#identificationCode}}
+                <a href="http://ec.europa.eu/transparencyregister/public/consultation/displaylobbyist.do?id={{this}}">Source</a>
+            {{/identificationCode}}
+        </div>
+    </div>  
+
 </script>
 {% endraw %}
 
 
 
 
-
+<script src="/js/sigma.min.js"></script>
+<script src="/js/sigma.parseGexf.js"></script>
+<script src="/js/sigma.forceatlas2.js"></script>
+<script src="/js/sigma.fisheye.js"></script>
+<script src="/js/graph.js"></script>
 
 <script>
     $(function() {
@@ -426,6 +443,10 @@ title: Loading...
                     $('#intro-tab').hide();
                     $('#associations-tab').click();
                 }
+
+                LobbyTransparency.graphArea($('#graph'));
+                LobbyTransparency.loadGraph(data.id);
+                
             }, 'jsonp');
         };
 
