@@ -23,12 +23,12 @@ QUERIES = [
     {
         'name': 'actor_by_fte',
         'label': 'Actors with the most lobbyists employed in a subcategory',
-        'query': 'SELECT ea.id AS id, ea.title AS title, ea."contactCountry" as "contactCountry", ea.members AS members, COUNT(re.id) as accreditations FROM entity_actor ea LEFT JOIN relation_employment re ON re.source_id = ea.id WHERE ea."subCategoryId" = :subCategoryId AND re.role = \'accredited\' GROUP BY ea.id, ea.title, ea.members, ea."contactCountry" ORDER BY members DESC NULLS LAST'
+        'query': 'SELECT ea.id AS id, ea.title AS title, ea."contactCountry" as "contactCountry", ea."staffMembers" AS members, COUNT(re.id) as accreditations FROM entity_actor ea LEFT JOIN relation_employment re ON re.source_id = ea.id WHERE ea."subCategoryId" = :subCategoryId AND re.role = \'accredited\' GROUP BY ea.id, ea.title, ea."staffMembers", ea."contactCountry" ORDER BY members DESC NULLS LAST'
     },
     {
         'name': 'fte_by_subcategory',
         'label': 'Categories of actors with the most lobbyists employed',
-        'query': 'SELECT ea."subCategory" AS "subCategory", COUNT(ea.members) AS members, (SELECT COUNT(re.id) FROM relation_employment re LEFT JOIN entity_actor e ON re.source_id = e.id WHERE e."subCategory" = ea."subCategory" AND re.role = \'accredited\') as accreditations FROM entity_actor ea WHERE ea."actsAsRepresentative" = true GROUP BY ea."subCategory" ORDER BY members DESC NULLS LAST'
+        'query': 'SELECT ea."subCategory" AS "subCategory", COUNT(ea."staffMembers") AS members, (SELECT COUNT(re.id) FROM relation_employment re LEFT JOIN entity_actor e ON re.source_id = e.id WHERE e."subCategory" = ea."subCategory" AND re.role = \'accredited\') as accreditations FROM entity_actor ea WHERE ea."actsAsRepresentative" = true GROUP BY ea."subCategory" ORDER BY members DESC NULLS LAST'
     }
 
 ]
