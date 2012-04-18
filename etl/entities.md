@@ -35,11 +35,11 @@ With this out of the way, here's the rules:
 * To map several entities to the same name, put in the same ``canonicalName``. 
   This is relatively particular about identity, so upper/lowercase, trailing 
   spaces and missing accents are all significant.
-* We're trying to come to a normalized name form. It is::
+* We're trying to come to a normalized name form. It is:
 
-    [Name] [Legal] ([Acronym])
+    [Name] [Legal] [(Acronym)]
 
-  Examples::
+  Examples:
 
     Bund Deutscher Industrieller e.V. (BDI)
     Friends of the Earth Europe (FoEE)
